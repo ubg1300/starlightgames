@@ -51,56 +51,32 @@
  
 </body>
    <script>
-        (function() {
-            // Use a fixed window name so we reuse (not duplicate) a "cloaked" tab if it already exists.
-            // Opening with a constant name (instead of '_blank') will reuse an existing tab/window
-            // that was previously opened with the same name.
-            const CLOAKED_WINDOW_NAME = 'playlist';
+document.addEventListener('DOMContentLoaded', function () {
+  const CLOAKED_WINDOW_NAME = 'tutorsfree_cloak_window'; // keep this exact across pages
 
-            document.addEventListener('DOMContentLoaded', function() {
-                // If this window was opened by another window, do nothing (this is the newly opened tab).
-                if (window.opener) {
-                    return;
-                }
+  // if this was opened by another window, do nothing
+  if (window.opener) return;
 
-                // Attempt to reuse an already-open "cloaked" tab by using a named window.
-                // If one exists, window.open will return a reference to it instead of creating a new tab.
-                // If popups are blocked, window.open returns null and we show an alert as before.
-                try {
-                    // Gather the current page HTML once (we'll write it into the target tab).
-                    const currentHtml = document.documentElement.outerHTML;
+  // Try to get/reuse the named window without forcing navigation to about:blank
+  const target = window.open('', CLOAKED_WINDOW_NAME);
 
-                    // Use the named-window approach to prefer reusing an existing cloaked tab.
-                    // We explicitly navigate it to about:blank to ensure same-origin for writing (if allowed).
-                    const newWindow = window.open('about:blank', CLOAKED_WINDOW_NAME);
+  if (!target) {
+    alert('Please enable popups!');
+    return;
+  }
 
-                    if (newWindow) {
-                        // Try writing into the target window. This may throw if the target
-                        // is cross-origin (unlikely if it was previously opened by this script).
-                        try {
-                            newWindow.document.open();
-                            newWindow.document.write(currentHtml);
-                            newWindow.document.close();
+  try {
+    // Attempt to write into the target (works if it's same-origin or created by this app)
+    target.document.open();
+    target.document.write(document.documentElement.outerHTML);
+    target.document.close();
 
-                            // Successfully handed off the HTML to the (possibly existing) cloaked tab.
-                            // Redirect the original tab to Google as before.
-                            window.location.replace('https://www.google.com');
-                        } catch (writeErr) {
-                            // Could not access/write the target window (cross-origin or other restriction).
-                            // As a fallback, notify the user. We avoid opening another tab to prevent duplication.
-                            console.warn('Failed to write to cloaked tab (might be cross-origin):', writeErr);
-                            alert("A cloaked tab exists but can't be reused (cross-origin or security restriction). Please close existing cloaked tabs or enable popups.");
-                        }
-                    } else {
-                        // Popup was blocked — inform the user (keeps previous behavior).
-                        alert("Please enable popups!");
-                    }
-                } catch (err) {
-                    // Any unexpected error: log and notify user.
-                    console.error('Unexpected error while trying to open/reuse cloaked tab:', err);
-                    alert("An unexpected error occurred while preparing the cloaked tab.");
-                }
-            });
-        })();
+    // Redirect the original tab
+    window.location.replace('https://www.google.com');
+  } catch (err) {
+    console.warn('Cannot reuse target (maybe cross-origin or navigated away):', err);
+    alert('A cloaked tab exists but cannot be reused. Close it or use a dedicated cloaked page.');
+  }
+});
     </script>
 </html>
