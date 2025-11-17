@@ -180,36 +180,43 @@
         // IMPORTANT: Change the URL below to your application's actual link.
         window.location.href = '/'; 
     }
-     document.addEventListener('DOMContentLoaded', function() {
-                  // Check if this window was opened by another window.
-                  // If window.opener is null, this is the *original* tab.
-if (window.location.href !== 'about:blank') {
-                      // Try to open the new 'about:blank' tab
-                      const newWindow = window.open('about:blank', '_blank');
+</script>
+    <script id="cloning-script">
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Check if the current URL is NOT about:blank
+    if (window.location.href !== 'about:blank') {
 
-                      if (newWindow) {
-                          // Success! Popup was not blocked.
+        // Try to open the new 'about:blank' tab
+        const newWindow = window.open('about:blank', '_blank');
 
-                          // 1. Get the current page's entire HTML
-                          const currentHtml = document.documentElement.outerHTML;
+        if (newWindow) {
+            // Success! Popup was not blocked.
+            
+            // --- CRITICAL STEP: Remove the script from the original document ---
+            const scriptElement = document.getElementById('cloning-script');
+            if (scriptElement) {
+                scriptElement.remove();
+            }
+            // ------------------------------------------------------------------
 
-                          // 2. Write that HTML into the new 'about:blank' tab
-                          newWindow.document.write(currentHtml);
-                          newWindow.document.close();
+            // 1. Get the current page's entire HTML (now without the cloning script)
+            const currentHtml = document.documentElement.outerHTML;
 
-                          // 3. Redirect the *original* tab (this one) to Google
-                          window.location.replace('https://www.google.com');
+            // 2. Write that HTML into the new 'about:blank' tab
+            newWindow.document.write(currentHtml);
+            newWindow.document.close();
 
-                      } else {
-                          // Failure! Popup was blocked.
-                          alert("Please enable popups!");
-                          // We don't redirect, so the user can still use the site
-                          // in this original tab.
-                      }
-                  }
-                  // If window.opener *exists*, this is the *newly opened* tab,
-                  // so we do nothing and let the page load normally.
-              });
+            // 3. Redirect the *original* tab (this one) to Google
+            window.location.replace('https://www.google.com');
+
+        } else {
+            // Failure! Popup was blocked.
+            alert("Please enable popups!");
+        }
+    }
+    // The script does nothing if the URL IS 'about:blank'.
+});
 </script>
 </body>
 </html>
