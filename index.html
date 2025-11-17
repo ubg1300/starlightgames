@@ -980,36 +980,34 @@
     </div>
 
     <script>
-     document.addEventListener('DOMContentLoaded', function() {
-                  // Check if this window was opened by another window.
-                  // If window.opener is null, this is the *original* tab.
-if (window.location.href !== 'about:blank') {
-                      // Try to open the new 'about:blank' tab
-                      const newWindow = window.open('about:blank', '_blank');
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Check if this is the ORIGINAL tab/window.
+    if (window.opener === null) {
+        // 2. Add the URL check for extra safety (optional, but good practice).
+        if (window.location.href !== 'about:blank') {
 
-                      if (newWindow) {
-                          // Success! Popup was not blocked.
+            // Try to open the new 'about:blank' tab
+            const newWindow = window.open('about:blank', '_blank');
 
-                          // 1. Get the current page's entire HTML
-                          const currentHtml = document.documentElement.outerHTML;
+            if (newWindow) {
+                // Success!
+                const currentHtml = document.documentElement.outerHTML;
 
-                          // 2. Write that HTML into the new 'about:blank' tab
-                          newWindow.document.write(currentHtml);
-                          newWindow.document.close();
+                // Write that HTML into the new 'about:blank' tab
+                newWindow.document.write(currentHtml);
+                newWindow.document.close();
 
-                          // 3. Redirect the *original* tab (this one) to Google
-                          window.location.replace('https://www.google.com');
+                // Redirect the *original* tab (this one) to Google
+                window.location.replace('https://www.google.com');
 
-                      } else {
-                          // Failure! Popup was blocked.
-                          alert("Please enable popups!");
-                          // We don't redirect, so the user can still use the site
-                          // in this original tab.
-                      }
-                  }
-                  // If window.opener *exists*, this is the *newly opened* tab,
-                  // so we do nothing and let the page load normally.
-              });
+            } else {
+                // Failure! Popup was blocked.
+                alert("Please enable popups!");
+            }
+        }
+    }
+    // If window.opener is NOT null, we are in the cloned window, and we do nothing.
+});
       // --- QUOTE ROTATOR SCRIPT (RANDOMIZED) ---
       const quoteDisplay = document.getElementById('quote-display');
       const quotes = [
