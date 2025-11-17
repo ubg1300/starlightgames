@@ -1,6 +1,7 @@
-setTimeout(() =>{
 // cloner.js content:
-document.addEventListener('DOMContentLoaded', function() {
+
+// The core logic function, now named for clarity
+function executeCloningLogic() {
     
     // Check if the current URL is NOT about:blank
     if (window.location.href !== 'about:blank') {
@@ -14,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 1. Find the script element itself
             const scriptElement = document.getElementById('cloning-script');
             
-            // 2. Remove the script element from the original document (MUST HAPPEN BEFORE capturing HTML)
+            // 2. Remove the script element from the original document
             if (scriptElement) {
                 scriptElement.remove();
             }
@@ -34,5 +35,17 @@ document.addEventListener('DOMContentLoaded', function() {
             alert("Please enable popups!");
         }
     }
+}
+
+
+// --- New Delay Implementation ---
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Set a delay of 1500 milliseconds (1.5 seconds)
+    const delayInMilliseconds = 1500; 
+    
+    console.log(`Cloning will start in ${delayInMilliseconds / 1000} seconds...`);
+
+    // Use setTimeout to wrap the cloning logic
+    setTimeout(executeCloningLogic, delayInMilliseconds);
 });
-}, 1);
