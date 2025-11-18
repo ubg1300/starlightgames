@@ -1305,11 +1305,18 @@
              toggleFooter();
           }
       function refreshIframe() {
-// Get the current URL from the iframe's location
-    const currentSrc = iframeEl.contentWindow.location.href;
+// 1. Get the current source URL.
+    const currentSrc = iframeEl.src;
     
-    // Use assign() or replace() to reload the current page.
-    iframeEl.contentWindow.location.assign(currentSrc);
+    // 2. Temporarily set the src to an empty string (or a dummy value)
+    // This tells the browser to stop loading the current content.
+    iframeEl.src = ''; 
+    
+    // 3. Immediately set the src back to the original URL.
+    // This forces the browser to initiate a full reload of the content.
+    setTimeout(function() {
+        iframeEl.src = currentSrc;
+    }, 10); // A small delay is sometimes needed for browser processing
 }
     </script>
     <script>
