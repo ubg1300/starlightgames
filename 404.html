@@ -9,7 +9,7 @@
             @import url('https://fonts.googleapis.com/css?family=Fira+Mono:400');
 
             body {
-                color: #5e9bdb; 
+                color: #5e9bdb;
                 background: repeating-linear-gradient(0deg, #0e0d0e 25%, #0e0d0e 50%, #171819 50%, #171819 75%);
                 background-size: 10px 10px;
                 height: 100vh;
@@ -24,12 +24,13 @@
             }
 
             @keyframes single-shake {
-                0% { transform: translate(1px, 1px) rotate(0deg); }
-                25% { transform: translate(-1px, -1px) rotate(-0.2deg); }
-                50% { transform: translate(1px, -1px) rotate(0.2deg); }
-                75% { transform: translate(-1px, 1px) rotate(-0.1deg); }
+                0% { transform: translate(2px, 2px) rotate(0deg); }
+                25% { transform: translate(-3px, -2px) rotate(-0.5deg); }
+                50% { transform: translate(3px, -2px) rotate(0.5deg); }
+                75% { transform: translate(-2px, 3px) rotate(-0.3deg); }
                 100% { transform: translate(0, 0) rotate(0deg); }
             }
+
 
             .wisedom {
                 font-family: url(VGA.tff);
@@ -38,309 +39,179 @@
                 color: #80c0ff;
                 letter-spacing: 0px;
                 font-size: 40px;
-                min-height: 50px;
-                animation: blink 0.5s step-end infinite alternate; 
-                border-right: 3px solid #80c0ff;
-                text-align: center; /* Center the typing text */
-                max-width: 80%; /* Prevent line wrapping outside the view */
+                text-align: center;
+                max-width: 80%;
+                padding-right: 3px; 
             }
 
             .shaky-char {
-                display: inline-block; 
-                animation: single-shake 100ms infinite; 
+                display: inline-block;
+                animation: single-shake 100ms infinite;
+            }
+
+            .cursor {
+                display: inline-block;
+                width: 3px;
+                height: 1.1em;
+                background-color: #80c0ff;
+                animation: blink 0.5s step-end infinite alternate;
             }
 
             @keyframes blink {
                 50% {
-                    border-color: transparent;
+                    background-color: transparent;
                 }
             }
+            /* --- AGGRESSIVE GLITCH CSS --- */
             .glitch {
                 font-size: 15vw;
                 position: relative;
-                color: ;
+                color: #5e9bdb; /* Base color */
             }
             .line:not(:first-child) {
                 position: absolute;
                 top: 0;
                 left: 0;
             }
+            
+            /* Glitch layers applied to the main text */
             .line:nth-child(1) {
-                animation: clip 3000ms -300ms linear infinite, glitch1 500ms -184ms linear infinite;
+                animation: clip 2500ms -250ms linear infinite, glitch1 300ms -100ms linear infinite; /* Faster and shorter duration */
             }
             @keyframes glitch1 {
-                0% {
-                    transform: translateX(0);
-                }
-                80% {
-                    transform: translateX(0);
-                    color: #fff;
-                }
-                85% {
-                    transform: translateX(4px); 
-                    color: #5e9bdb; 
-                }
-                90% {
-                    transform: translateX(-3px); 
-                    color: #80c0ff; 
-                }
-                95% {
-                    transform: translateX(1px); 
-                    color: #fff;
-                }
-                100% {
-                    transform: translateX(0);
-                }
+                0% { transform: translateX(0); }
+                70% { transform: translateX(0); color: #fff; }
+                75% { transform: translateX(8px); color: #ff0000; } /* Max shift 8px, using red for aggression */
+                80% { transform: translateX(-6px); color: #80c0ff; }
+                85% { transform: translateX(3px); color: #fff; }
+                90% { transform: translateX(-8px); color: #5e9bdb; }
+                95% { transform: translateX(5px); color: #fff; }
+                100% { transform: translateX(0); }
             }
             .line:nth-child(2) {
-                animation: clip 3000ms -600ms linear infinite, glitch2 500ms -740ms linear infinite;
+                animation: clip 2500ms -500ms linear infinite, glitch2 300ms -700ms linear infinite;
             }
             @keyframes glitch2 {
-                0% {
-                    transform: translateX(0);
-                }
-                80% {
-                    transform: translateX(0);
-                    color: #fff;
-                }
-                85% {
-                    transform: translateX(-5px); 
-                    color: #5e9bdb;
-                }
-                90% {
-                    transform: translateX(2px); 
-                    color: #80c0ff;
-                }
-                95% {
-                    transform: translateX(-1px); 
-                    color: #fff;
-                }
-                100% {
-                    transform: translateX(0);
-                }
+                0% { transform: translateX(0); }
+                70% { transform: translateX(0); color: #fff; }
+                75% { transform: translateX(-10px); color: #00ff00; } /* Max shift 10px, green */
+                80% { transform: translateX(5px); color: #80c0ff; }
+                85% { transform: translateX(-2px); color: #fff; }
+                90% { transform: translateX(9px); color: #5e9bdb; }
+                95% { transform: translateX(-7px); color: #fff; }
+                100% { transform: translateX(0); }
             }
             .line:nth-child(3) {
-                animation: clip 3000ms -900ms linear infinite, glitch3 500ms -333ms linear infinite;
+                animation: clip 2500ms -750ms linear infinite, glitch3 300ms -300ms linear infinite;
             }
             @keyframes glitch3 {
-                0% {
-                    transform: translateX(0);
-                }
-                80% {
-                    transform: translateX(0);
-                    color: #fff;
-                }
-                85% {
-                    transform: translateX(-1px); 
-                    color: #5e9bdb;
-                }
-                90% {
-                    transform: translateX(4px); 
-                    color: #80c0ff;
-                }
-                95% {
-                    transform: translateX(3px); 
-                    color: #fff;
-                }
-                100% {
-                    transform: translateX(0);
-                }
+                0% { transform: translateX(0); }
+                70% { transform: translateX(0); color: #fff; }
+                75% { transform: translateX(6px); color: #ffff00; } /* Yellow */
+                80% { transform: translateX(-7px); color: #80c0ff; }
+                85% { transform: translateX(4px); color: #fff; }
+                90% { transform: translateX(-9px); color: #5e9bdb; }
+                95% { transform: translateX(2px); color: #fff; }
+                100% { transform: translateX(0); }
             }
             .line:nth-child(4) {
-                animation: clip 3000ms -1200ms linear infinite, glitch4 500ms -733ms linear infinite;
+                animation: clip 2500ms -1000ms linear infinite, glitch4 300ms -700ms linear infinite;
             }
             @keyframes glitch4 {
-                0% {
-                    transform: translateX(0);
-                }
-                80% {
-                    transform: translateX(0);
-                    color: #fff;
-                }
-                85% {
-                    transform: translateX(5px); 
-                    color: #5e9bdb;
-                }
-                90% {
-                    transform: translateX(-2px); 
-                    color: #80c0ff;
-                }
-                95% {
-                    transform: translateX(0px);
-                    color: #fff;
-                }
-                100% {
-                    transform: translateX(0);
-                }
+                0% { transform: translateX(0); }
+                70% { transform: translateX(0); color: #fff; }
+                75% { transform: translateX(-8px); color: #ff00ff; } /* Magenta */
+                80% { transform: translateX(4px); color: #80c0ff; }
+                85% { transform: translateX(-5px); color: #fff; }
+                90% { transform: translateX(7px); color: #5e9bdb; }
+                95% { transform: translateX(-3px); color: #fff; }
+                100% { transform: translateX(0); }
             }
             .line:nth-child(5) {
-                animation: clip 3000ms -1500ms linear infinite, glitch5 500ms -896ms linear infinite;
+                animation: clip 2500ms -1250ms linear infinite, glitch5 300ms -800ms linear infinite;
             }
             @keyframes glitch5 {
-                0% {
-                    transform: translateX(0);
-                }
-                80% {
-                    transform: translateX(0);
-                    color: #fff;
-                }
-                85% {
-                    transform: translateX(-3px); 
-                    color: #5e9bdb;
-                }
-                90% {
-                    transform: translateX(1px); 
-                    color: #80c0ff;
-                }
-                95% {
-                    transform: translateX(-4px); 
-                    color: #fff;
-                }
-                100% {
-                    transform: translateX(0);
-                }
+                0% { transform: translateX(0); }
+                70% { transform: translateX(0); color: #fff; }
+                75% { transform: translateX(10px); color: #00ffff; } /* Cyan */
+                80% { transform: translateX(-3px); color: #80c0ff; }
+                85% { transform: translateX(6px); color: #fff; }
+                90% { transform: translateX(-7px); color: #5e9bdb; }
+                95% { transform: translateX(4px); color: #fff; }
+                100% { transform: translateX(0); }
             }
             .line:nth-child(6) {
-                animation: clip 3000ms -1800ms linear infinite, glitch6 500ms -815ms linear infinite;
+                animation: clip 2500ms -1500ms linear infinite, glitch6 300ms -800ms linear infinite;
             }
             @keyframes glitch6 {
-                0% {
-                    transform: translateX(0);
-                }
-                80% {
-                    transform: translateX(0);
-                    color: #fff;
-                }
-                85% {
-                    transform: translateX(4px); 
-                    color: #5e9bdb;
-                }
-                90% {
-                    transform: translateX(-1px); 
-                    color: #80c0ff;
-                }
-                95% {
-                    transform: translateX(2px); 
-                    color: #fff;
-                }
-                100% {
-                    transform: translateX(0);
-                }
+                0% { transform: translateX(0); }
+                70% { transform: translateX(0); color: #fff; }
+                75% { transform: translateX(-6px); color: #ff4500; } /* Orange Red */
+                80% { transform: translateX(8px); color: #80c0ff; }
+                85% { transform: translateX(-4px); color: #fff; }
+                90% { transform: translateX(5px); color: #5e9bdb; }
+                95% { transform: translateX(-10px); color: #fff; }
+                100% { transform: translateX(0); }
             }
             .line:nth-child(7) {
-                animation: clip 3000ms -2100ms linear infinite, glitch7 500ms -34ms linear infinite;
+                animation: clip 2500ms -1750ms linear infinite, glitch7 300ms -30ms linear infinite;
             }
             @keyframes glitch7 {
-                0% {
-                    transform: translateX(0);
-                }
-                80% {
-                    transform: translateX(0);
-                    color: #fff;
-                }
-                85% {
-                    transform: translateX(-2px); 
-                    color: #5e9bdb;
-                }
-                90% {
-                    transform: translateX(5px); 
-                    color: #80c0ff;
-                }
-                95% {
-                    transform: translateX(-3px); 
-                    color: #fff;
-                }
-                100% {
-                    transform: translateX(0);
-                }
+                0% { transform: translateX(0); }
+                70% { transform: translateX(0); color: #fff; }
+                75% { transform: translateX(9px); color: #ff69b4; } /* Hot Pink */
+                80% { transform: translateX(-5px); color: #80c0ff; }
+                85% { transform: translateX(2px); color: #fff; }
+                90% { transform: translateX(-8px); color: #5e9bdb; }
+                95% { transform: translateX(7px); color: #fff; }
+                100% { transform: translateX(0); }
             }
             .line:nth-child(8) {
-                animation: clip 3000ms -2400ms linear infinite, glitch8 500ms -842ms linear infinite;
+                animation: clip 2500ms -2000ms linear infinite, glitch8 300ms -800ms linear infinite;
             }
             @keyframes glitch8 {
-                0% {
-                    transform: translateX(0);
-                }
-                80% {
-                    transform: translateX(0);
-                    color: #fff;
-                }
-                85% {
-                    transform: translateX(3px); 
-                    color: #5e9bdb;
-                }
-                90% {
-                    transform: translateX(-4px); 
-                    color: #80c0ff;
-                }
-                95% {
-                    transform: translateX(1px); 
-                    color: #fff;
-                }
-                100% {
-                    transform: translateX(0);
-                }
+                0% { transform: translateX(0); }
+                70% { transform: translateX(0); color: #fff; }
+                75% { transform: translateX(-7px); color: #00fa9a; } /* Medium Spring Green */
+                80% { transform: translateX(3px); color: #80c0ff; }
+                85% { transform: translateX(-6px); color: #fff; }
+                90% { transform: translateX(10px); color: #5e9bdb; }
+                95% { transform: translateX(-4px); color: #fff; }
+                100% { transform: translateX(0); }
             }
             .line:nth-child(9) {
-                animation: clip 3000ms -2700ms linear infinite, glitch9 500ms -751ms linear infinite;
+                animation: clip 2500ms -2250ms linear infinite, glitch9 300ms -700ms linear infinite;
             }
             @keyframes glitch9 {
-                0% {
-                    transform: translateX(0);
-                }
-                80% {
-                    transform: translateX(0);
-                    color: #fff;
-                }
-                85% {
-                    transform: translateX(1px); 
-                    color: #5e9bdb;
-                }
-                90% {
-                    transform: translateX(3px); 
-                    color: #80c0ff;
-                }
-                95% {
-                    transform: translateX(-5px); 
-                    color: #fff;
-                }
-                100% {
-                    transform: translateX(0);
-                }
+                0% { transform: translateX(0); }
+                70% { transform: translateX(0); color: #fff; }
+                75% { transform: translateX(5px); color: #8a2be2; } /* Blue Violet */
+                80% { transform: translateX(-8px); color: #80c0ff; }
+                85% { transform: translateX(1px); color: #fff; }
+                90% { transform: translateX(-6px); color: #5e9bdb; }
+                95% { transform: translateX(9px); color: #fff; }
+                100% { transform: translateX(0); }
             }
             .line:nth-child(10) {
-                animation: clip 3000ms -3000ms linear infinite, glitch10 500ms -648ms linear infinite;
+                animation: clip 2500ms -2500ms linear infinite, glitch10 300ms -600ms linear infinite;
             }
             @keyframes glitch10 {
-                0% {
-                    transform: translateX(0);
-                }
-                80% {
-                    transform: translateX(0);
-                    color: #fff;
-                }
-                85% {
-                    transform: translateX(-4px); 
-                    color: #5e9bdb;
-                }
-                90% {
-                    transform: translateX(2px); 
-                    color: #80c0ff;
-                }
-                95% {
-                    transform: translateX(4px); 
-                    color: #fff;
-                }
-                100% {
-                    transform: translateX(0);
-                }
+                0% { transform: translateX(0); }
+                70% { transform: translateX(0); color: #fff; }
+                75% { transform: translateX(-9px); color: #f08080; } /* Light Coral */
+                80% { transform: translateX(6px); color: #80c0ff; }
+                85% { transform: translateX(-3px); color: #fff; }
+                90% { transform: translateX(8px); color: #5e9bdb; }
+                95% { transform: translateX(-5px); color: #fff; }
+                100% { transform: translateX(0); }
             }
             @keyframes clip {
+                /* Faster, more chaotic clipping */
                 0% {
-                    clip-path: polygon(0 100%, 100% 100%, 100% 120%, 0 120%);
+                    clip-path: polygon(0 100%, 100% 100%, 100% 150%, 0 150%);
                 }
                 100% {
-                    clip-path: polygon(0 -20%, 100% -20%, 100% 0%, 0 0);
+                    clip-path: polygon(0 -50%, 100% -50%, 100% 0%, 0 0);
                 }
             }
 
@@ -348,14 +219,14 @@
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                gap: 35px; /* Spacing between the buttons/links */
+                gap: 35px;
                 margin-top: 20px;
             }
 
             a {
                 padding: 10px 20px;
-                background-color: #80c0ff; /* Light Blue Button Background */
-                color: #0e0d0e; /* Dark Text for Contrast */
+                background-color: #80c0ff;
+                color: #0e0d0e;
                 border-radius: 5px;
                 text-decoration: none;
                 cursor: pointer;
@@ -364,8 +235,8 @@
             }
 
             .return-home {
-                background: none; /* Make this a link, not a full button */
-                color: #5e9bdb; /* Match the body text */
+                background: none;
+                color: #5e9bdb;
                 padding: 0;
                 font-weight: normal;
                 text-decoration: underline;
@@ -389,14 +260,15 @@
             <div class="line">Error 404</div>
             <div class="line">Error 404</div>
             <div class="line">Error 404</div>
+            <div class="line">Error 404</div>
         </div>
         <span class="wisedom"></span>
-        
+
         <div class="button-container">
             <a href="/chat.html" target="_blank">Contact Support</a>
             <a href="/" class="return-home">Return home?</a>
         </div>
-        
+
         <script>
             // G O O F Y W I S D O M
             const wiseness = [
@@ -410,6 +282,7 @@
                 'Did you bring snacks? Because you\'re stuck here now.',
                 'I am currently judging your life choices from beyond the screen.',
                 'Try clicking the blue button. It may or may not summon a duck.',
+                'Im going to sleep im done typing, bye!'
             ];
             const element = document.getElementsByClassName('wisedom')[0];
 
@@ -418,52 +291,63 @@
             let typingTimeout;
             let deletingTimeout;
 
+            // Cursor element setup
+            const cursor = document.createElement('span');
+            cursor.className = 'cursor';
+            element.appendChild(cursor); 
+
             function type() {
-                // Loop messages
                 if (currentTextIndex >= wiseness.length) {
-                    currentTextIndex = 0; 
+                    currentTextIndex = 0;
                 }
 
                 let text = wiseness[currentTextIndex];
-                let typeSpeed = 50; 
+                let typeSpeed = 50;
+
+                if (cursor.parentElement !== element) {
+                    element.appendChild(cursor);
+                }
 
                 if (charIndex < text.length) {
                     const char = text.charAt(charIndex);
-                    
+
                     const shakySpan = document.createElement('span');
                     shakySpan.className = 'shaky-char';
                     shakySpan.textContent = char;
-                    
-                    element.appendChild(shakySpan);
+
+                    element.insertBefore(shakySpan, cursor);
 
                     setTimeout(() => {
-                        // Replace the shaky span with just the text content after the shake animation
                         shakySpan.outerHTML = shakySpan.innerHTML;
-                    }, 100); 
+                    }, 100);
 
                     charIndex++;
                     typingTimeout = setTimeout(type, typeSpeed);
                 } else {
-                    deletingTimeout = setTimeout(deleteText, 5000); 
+                    deletingTimeout = setTimeout(deleteText, 5000);
                 }
             }
 
-            function deleteText() {
+          function deleteText() {
                 let text = wiseness[currentTextIndex];
-                let deleteSpeed = 25; 
+                let deleteSpeed = 25; // SLOWED DOWN for visible deletion
 
                 if (charIndex > 0) {
+                    // 1. Overwrite content with one less character
                     element.innerHTML = text.substring(0, charIndex - 1);
+                    
+                    // 2. RE-ATTACH the cursor (which was destroyed by innerHTML)
+                    element.appendChild(cursor); 
+
                     charIndex--;
                     deletingTimeout = setTimeout(deleteText, deleteSpeed);
                 } else {
                     currentTextIndex++;
-                    typingTimeout = setTimeout(type, 800); 
+                    typingTimeout = setTimeout(type, 800);
                 }
             }
 
-            // Start the typing sequence
-            setTimeout(type, 2000); 
+            setTimeout(type, 2000);
         </script>
     </body>
 </html>
