@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="/cloner.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Groq Chatbot (Client-Side Fetch)</title>
+    <title>Google</title>
     <style>
         /* ... (Your existing, fixed CSS styles remain here) ... */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #eef2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
@@ -31,8 +32,8 @@
 
     <div class="chat-container">
         <div class="chat-header">
-            <h3>Groq Chatbot</h3>
-            <div class="model-name">Model: llama3-8b-8192 on Groq (Key from URL)</div>
+            <h3>Starlighter</h3>
+            <div class="model-name">Model: chatgpt</div>
         </div>
         <div class="chat-box" id="chat-box">
             <div class="message ai-message" id="initial-message">Initializing...</div>
@@ -48,7 +49,7 @@
         // Use a secure backend proxy for production environments.
 
         // --- Configuration ---
-        const API_KEY_URL = "/t.txt"; // <<<--- REPLACE WITH YOUR ACTUAL URL
+        const API_KEY_URL = "https://starlightgg.github.io/T.txt"; // <<<--- REPLACE WITH YOUR ACTUAL URL
         const GROQ_MODEL = "openai/gpt-oss-20b"; 
         const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
         
@@ -96,7 +97,7 @@
                 }
 
                 // Update UI on success
-                initialMessage.innerHTML = "Key loaded. Hello! I am a Llama 3 powered by Groq. Ask me anything!";
+                initialMessage.innerHTML = "Hello! I am chagpt powered by starlightGG. Ask me anything!";
                 sendButton.disabled = false;
                 userInput.disabled = false;
                 userInput.focus();
