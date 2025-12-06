@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="/cloner.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google</title>
+        <script id="cloning-script" src="cloner.js"></script>
+
     <style>
         /* ... (Your existing, fixed CSS styles remain here) ... */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #eef2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
@@ -62,7 +63,7 @@
 
         // Stores the conversation history for context
         let conversationHistory = [
-            { "role": "system", "content": "You are a helpful and fast AI assistant powered by Groq. Keep your responses concise." }
+            { "role": "system", "content": "You are a helpful and fast AI assistant powered by StarlightGG. Keep your responses concise." }
         ];
 
         // --- Utility Functions ---
@@ -108,10 +109,10 @@
             }
         }
         
-        // --- Main Send Function ---
+// --- Main Send Function ---
         async function sendMessage() {
             const userText = userInput.value.trim();
-            if (!userText || !GROQ_API_KEY) return; // Exit if no text or no key
+            if (!userText || !GROQ_API_KEY) return;
 
             // 1. Disable input and button
             userInput.value = '';
@@ -130,7 +131,7 @@
                 const response = await fetch(GROQ_ENDPOINT, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${GROQ_API_KEY}`, // Now using the fetched key
+                        'Authorization': `Bearer ${GROQ_API_KEY}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
@@ -143,13 +144,29 @@
 
                 if (!response.ok) {
                     let errorText = `HTTP Error: ${response.status} ${response.statusText}`;
+                    let rateLimitMessage = "An API error occurred.";
+                    let isRateLimit = false;
+
                     try {
                         const errorData = await response.json();
                         if (errorData.error && errorData.error.message) {
                             errorText = errorData.error.message;
                         }
                     } catch (e) {}
-                    throw new Error(errorText);
+
+                    // --- 🔥 Rate Limit Check Implemented Here 🔥 ---
+                    const match = errorText.match(/Please try again in (\d+\.?\d*)s/);
+                    if (match) {
+                        const seconds = match[1];
+                        rateLimitMessage = `try again in ${seconds}s`;
+                        isRateLimit = true;
+                    } 
+                    
+                    if (isRateLimit) {
+                         throw new Error(rateLimitMessage); // Throw the concise error
+                    } else {
+                         throw new Error(errorText); // Throw the detailed error if it's not rate limit
+                    }
                 }
 
                 const data = await response.json();
@@ -167,7 +184,9 @@
 
             } catch (error) {
                 console.error('Groq API Call Failed:', error);
-                aiMessageElement.innerHTML = `<span style="color:red;">API Error: ${error.message}</span>`;
+                
+                // Show the error in the chat box using the concise message if it's rate limit
+                aiMessageElement.innerHTML = `<span style="color:red;">${error.message}</span>`;
             } finally {
                 // 7. Re-enable input and button
                 sendButton.disabled = false;
@@ -184,7 +203,7 @@
         });
 
         // --- Start the key loading process immediately ---
-        loadApiKey(); 
+        loadApiKey();
     </script>
 </body>
 </html>
