@@ -4,1114 +4,1408 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google</title>
-<style>
+<style>/* --- Neumorphic Base Color and Variables --- */
+:root {
+    --neumorphic-bg: #e0e5ec;
+    --main-color: #007bff; /* Primary Blue */
+    --secondary-color: #28a745; /* Send Button Green */
+    --shadow-light: #ffffff;
+    --shadow-dark: #a3b1c6;
+    --radius: 12px;
+    --input-radius: 25px; /* Deeper curve for inputs */
+    --inner-shadow-recessed: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light);
+    --outer-shadow-embossed: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+}
 
-        /* --- Neumorphic Base Color and Variables --- */
-        :root {
-            --neumorphic-bg: #e0e5ec;
-            --main-color: #007bff;
-            --secondary-color: #28a745;
-            --shadow-light: #ffffff;
-            --shadow-dark: #a3b1c6;
-            --radius: 12px;
-            --inner-shadow-recessed: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light);
-            --outer-shadow-embossed: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
-        }
+/* --- Base and Full-Screen Layout --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-        /* --- Base and Full-Screen Layout --- */
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: var(--neumorphic-bg); 
-            margin: 0; 
-            padding: 0; 
-            height: 100vh; 
-            overflow: hidden; 
-            display: flex; 
-        }
-        
-        /* Main Chat Container (Controlled by JS showChatInterface) */
-        .flex-container {
-            display: none; 
-            height: 100%;
-            width: 100%;
-            flex-direction: row; 
-        }
+body, html {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--neumorphic-bg);
+    color: #333; /* Darker text for light background */
+    height: 100vh;
+    overflow: hidden;
+}
 
-        .main-chat-area {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            height: 100%;
-        }
+/* --- App Container Layout (Fixing the main layout class) --- */
+.app-container {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
 
-        /* --- Start Page Styles --- */
-        .start-page {
-            display: none; 
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--neumorphic-bg);
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            text-align: center;
-            padding: 20px;
-            z-index: 100;
-        }
+/* --- Sidebar --- */
+.sidebar {
+    width: 280px;
+    background-color: var(--neumorphic-bg);
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    box-shadow: var(--outer-shadow-embossed); /* Sidebar stands out slightly */
+    flex-shrink: 0;
+}
 
-        .welcome-box {
-            background-color: var(--neumorphic-bg);
-            border-radius: var(--radius);
-            padding: 40px;
-            max-width: 600px;
-            width: 90%;
-            box-shadow: var(--outer-shadow-embossed);
-        }
+.sidebar-header {
+    padding: 10px 0;
+    margin-bottom: 10px;
+    text-align: center;
+}
 
-        .welcome-box h1 {
-            color: var(--main-color);
-            font-size: 3em;
-            margin-bottom: 20px;
-        }
+.sidebar-header h2 {
+    color: var(--main-color);
+    font-size: 1.5em;
+    font-weight: 700;
+}
 
-        /* --- Model Selector Buttons on Start Page --- */
-        .model-selector-container {
-            margin-top: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .model-button {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1em;
-            font-weight: 600;
-            cursor: pointer;
-            background-color: var(--neumorphic-bg);
-            color: #444;
-            transition: all 0.2s;
-            box-shadow: var(--inner-shadow-recessed); 
-            pointer-events: none; 
-        }
+.new-chat-button {
+    width: 100%; 
+    padding: 12px; 
+    background-color: var(--main-color); 
+    color: white; 
+    border: none; 
+    border-radius: var(--radius); 
+    cursor: pointer; 
+    font-size: 1em; 
+    font-weight: 600; 
+    margin-bottom: 20px; 
+    transition: all 0.2s; 
+    /* Primary Color Neumorphic Shadow */
+    box-shadow: 4px 4px 8px rgba(0, 123, 255, 0.4), -4px -4px 8px var(--shadow-light); 
+}
+.new-chat-button:active { 
+    box-shadow: var(--inner-shadow-recessed); 
+    background-color: #0069d9;
+    transform: scale(0.98); 
+}
 
-        .model-button:hover:not(.selected) {
-            color: var(--main-color);
-        }
-        
-        .model-button.selected {
-             box-shadow: var(--outer-shadow-embossed); 
-             color: var(--main-color);
-        }
-        
-        /* --- Sidebar & Chat List Styles --- */
-        .sidebar {
-            width: 280px; background-color: var(--neumorphic-bg); display: flex; flex-direction: column; padding: 15px; box-shadow: var(--outer-shadow-embossed); flex-shrink: 0; 
-        }
-        .new-chat-button {
-            width: 100%; padding: 12px; background-color: var(--main-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: 600; margin-bottom: 20px; transition: all 0.2s; box-shadow: 4px 4px 8px #0056b3, -4px -4px 8px #009bff; 
-        }
-        .new-chat-button:active { box-shadow: var(--inner-shadow-recessed); transform: scale(0.98); }
-        .chat-list { flex-grow: 1; overflow-y: auto; margin-bottom: 15px; }
-        .chat-item { padding: 10px; margin-bottom: 10px; border-radius: var(--radius); cursor: pointer; font-size: 0.9em; color: #444; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; transition: all 0.2s; background: var(--neumorphic-bg); box-shadow: 2px 2px 4px var(--shadow-dark), -2px -2px 4px var(--shadow-light); }
-        .chat-item.active { box-shadow: var(--inner-shadow-recessed); color: var(--main-color); font-weight: 600; }
-        .chat-header { display: flex; align-items: center; justify-content: center; padding: 15px 20px; background-color: var(--neumorphic-bg); color: #333; box-shadow: var(--inner-shadow-recessed); flex-shrink: 0; }
-        .chat-box { position: relative; background-color: var(--neumorphic-bg); box-shadow: var(--inner-shadow-recessed); flex-grow: 1; overflow-y: auto; padding: 20px; }
-        
-        /* --- Message Bubbles --- */
-        .message { margin-bottom: 15px; padding: 10px 15px; border-radius: 18px; line-height: 1.5; max-width: 85%; word-wrap: break-word; }
-        .user-message { background-color: var(--main-color); color: white; margin-left: auto; border-bottom-right-radius: 4px; box-shadow: 2px 2px 4px #0056b3, -2px -2px 4px #009bff; }
-        .ai-message { background-color: var(--neumorphic-bg); color: #333; margin-right: auto; border-bottom-left-radius: 4px; box-shadow: 2px 2px 4px var(--shadow-dark), -2px -2px 4px var(--shadow-light); }
-        .welcome-prompt { color: var(--shadow-dark); }
+.chat-list { 
+    flex-grow: 1; 
+    overflow-y: auto; 
+    margin-bottom: 15px; 
+    padding-right: 5px;
+}
+/* Style for individual chat items */
+.chat-item { 
+    padding: 10px; 
+    margin-bottom: 10px; 
+    border-radius: var(--radius); 
+    cursor: pointer; 
+    font-size: 0.9em; 
+    color: #555; 
+    overflow: hidden; 
+    white-space: nowrap; 
+    text-overflow: ellipsis; 
+    transition: all 0.2s; 
+    background: var(--neumorphic-bg); 
+    box-shadow: 2px 2px 4px var(--shadow-dark), -2px -2px 4px var(--shadow-light); 
+}
+.chat-item.active { 
+    box-shadow: var(--inner-shadow-recessed); 
+    color: var(--main-color); 
+    font-weight: 600; 
+}
+.chat-item:hover {
+    box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+    color: #333;
+}
 
-        /* --- Input Area and Bottom Dropdown --- */
-        .input-area { 
-            display: flex; 
-            padding: 15px; 
-            background-color: var(--neumorphic-bg); 
-            box-shadow: var(--outer-shadow-embossed);
-            flex-shrink: 0;
-            flex-direction: column; 
-            gap: 10px;
-        }
+.sidebar-footer {
+    padding: 10px 0;
+    font-size: 0.8em;
+    color: #666;
+    border-top: 1px solid var(--shadow-dark); /* Subtle separator */
+}
 
-        .input-and-select-row {
-            display: flex;
-            width: 100%;
-            align-items: flex-start; /* Align items to the top to accommodate growing textarea */
-        }
+/* --- Main Content Area --- */
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Ensure it fills remaining space */
+}
 
-        .model-select-container {
-            display: flex;
-            width: 100%;
-            justify-content: flex-start;
-            padding: 0 10px;
-        }
-        
-        .model-select-container label {
-            color: #555;
-            font-size: 0.9em;
-            margin-right: 10px;
-            align-self: center;
-        }
-        
-        .model-select {
-            padding: 8px 15px;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 1em; 
-            background-color: var(--neumorphic-bg);
-            box-shadow: var(--inner-shadow-recessed);
-            color: #444;
-            cursor: pointer;
-            appearance: none; 
-            transition: all 0.2s;
-        }
-        
-        .model-select:focus {
-            outline: none;
-            box-shadow: var(--inner-shadow-recessed), 0 0 0 2px var(--main-color);
-        }
-        
-        /* Style for the TEXTAREA element */
-        .input-and-select-row textarea { 
-            flex-grow: 1; 
-            padding: 12px 18px; 
-            border: none; 
-            border-radius: 25px; /* Neumorphic rounded corners */
-            margin-right: 10px; 
-            font-size: 1em; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Keep consistent font */
-            background-color: var(--neumorphic-bg); 
-            box-shadow: var(--inner-shadow-recessed); 
-            resize: none; /* Disable manual resizing by user */
-            min-height: 25px; /* Ensure it's not too small */
-            max-height: 150px; /* Optional: Prevent it from filling the entire screen */
-            overflow-y: auto; /* Show scrollbar if max-height is reached */
-            color: #333;
-            line-height: 1.4;
-            transition: all 0.2s;
-        }
-        
-        .input-and-select-row textarea:focus {
-            outline: none;
-            box-shadow: var(--inner-shadow-recessed), 0 0 0 1px var(--main-color);
-        }
+/* --- Start Page Styles (Aligned with HTML) --- */
+.start-page {
+    /* Using display: none and display: flex/block is handled by JS */
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--neumorphic-bg);
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+    z-index: 100;
+}
 
-        .input-and-select-row textarea:disabled {
-             opacity: 0.7;
-             cursor: not-allowed;
-             box-shadow: inset 2px 2px 4px var(--shadow-dark); /* Visually flatter when disabled */
-        }
+.start-page h1 {
+    color: var(--main-color);
+    font-size: 3em;
+    margin-bottom: 10px;
+}
 
-        .input-area button { 
-            background-color: var(--secondary-color); 
-            box-shadow: 4px 4px 8px #1e7e34, -4px -4px 8px #32c858; 
-            padding: 10px 20px; 
-            border: none; 
-            border-radius: 25px; 
-            align-self: flex-start; /* Ensure button is vertically aligned with top of textarea */
-        }
-        .input-area button:active:not(:disabled) { 
-            box-shadow: inset 4px 4px 8px #1e7e34, inset -4px -4px 8px #32c858; 
-            transform: scale(0.98); 
-        }
+.model-selector-container {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: row; /* Changed to row for a wider layout */
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
 
-        /* --- Custom Context Menu Styles --- */
-        #context-menu {
-            position: absolute;
-            background-color: var(--neumorphic-bg);
-            border-radius: var(--radius);
-            padding: 5px;
-            box-shadow: var(--outer-shadow-embossed); 
-            list-style: none;
-            margin: 0;
-            display: none; 
-            z-index: 1000;
-            min-width: 150px;
-        }
+/* Model Button Styling */
+.model-button {
+    padding: 15px 30px;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    background-color: var(--neumorphic-bg);
+    color: #444;
+    transition: all 0.2s;
+    /* Recessed look for unselected buttons */
+    box-shadow: var(--inner-shadow-recessed); 
+    pointer-events: none; /* Controlled by JS when key loads */
+}
 
-        #context-menu button {
-            display: block;
-            width: 100%;
-            padding: 10px 15px;
-            text-align: left;
-            border: none;
-            border-radius: 8px;
-            background: none;
-            color: #444;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: background-color 0.2s, color 0.2s;
-        }
+.model-button.selected {
+    /* Embossed/Primary look for selected button */
+    box-shadow: var(--outer-shadow-embossed); 
+    color: var(--main-color);
+    background-color: #d1d9e6; /* Slightly different shade for selected state */
+}
 
-        #context-menu button:hover {
-            background-color: rgba(0, 123, 255, 0.1);
-            color: var(--main-color);
-        }
-        
-        .delete-option {
-            color: #dc3545;
-        }
+/* --- Chat Container & Messages --- */
+.chat-container {
+    display: flex; /* Overrides the default display: none */
+    flex-direction: column;
+    flex-grow: 1;
+    min-height: 0;
+}
 
-        @media (max-width: 768px) { .sidebar { display: none; } }
-        
-        /* --- MODAL STYLES --- */
-        .modal-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000; 
-            transition: opacity 0.3s;
-        }
-        
-        .modal-dialog {
-            background-color: var(--neumorphic-bg);
-            border-radius: var(--radius);
-            padding: 30px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: var(--outer-shadow-embossed);
-            text-align: center;
-        }
-        
-        .modal-dialog h3 {
-            margin-top: 0;
-            color: #333;
-        }
-        
-        .modal-dialog p {
-            color: #555;
-            margin-bottom: 20px;
-        }
+.chat-box {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background-color: var(--neumorphic-bg);
+}
 
-        .modal-buttons {
-            display: flex;
-            justify-content: space-around;
-            gap: 10px;
-        }
-        
-        .modal-buttons button,
-        .modal-input input {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .modal-buttons .confirm-btn {
-            background-color: var(--main-color);
-            color: white;
-            box-shadow: 3px 3px 6px #0056b3, -3px -3px 6px #009bff;
-        }
-        
-        .modal-buttons .confirm-btn:active {
-            box-shadow: var(--inner-shadow-recessed);
-        }
+.welcome-prompt { 
+    text-align: center;
+    padding: 50px;
+    color: var(--shadow-dark); 
+}
 
-        .modal-buttons .cancel-btn {
-            background-color: var(--neumorphic-bg);
-            color: #444;
-            box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
-        }
-        
-        .modal-buttons .cancel-btn:active {
-            box-shadow: var(--inner-shadow-recessed);
-        }
-        
-        /* Prompt specific styles */
-        .modal-input {
-            margin-bottom: 20px;
-        }
-        
-        .modal-input input {
-            width: 100%;
-            box-sizing: border-box;
-            background-color: var(--neumorphic-bg);
-            box-shadow: var(--inner-shadow-recessed);
-            color: #333;
-        }
+.message { 
+    margin-bottom: 15px; 
+    padding: 12px 18px; 
+    border-radius: 18px; 
+    line-height: 1.5; 
+    max-width: 80%; 
+    word-wrap: break-word; 
+    font-size: 1em;
+}
 
-    </style>
+.user-message { 
+    background-color: var(--main-color); 
+    color: white; 
+    margin-left: auto; 
+    border-bottom-right-radius: 4px; 
+    box-shadow: 2px 2px 4px rgba(0, 123, 255, 0.4), -2px -2px 4px rgba(0, 123, 255, 0.2); 
+}
+.ai-message { 
+    background-color: #f0f5fa; /* Lighter shade of background for AI */
+    color: #333; 
+    margin-right: auto; 
+    border-bottom-left-radius: 4px; 
+    box-shadow: 2px 2px 4px var(--shadow-dark), -2px -2px 4px var(--shadow-light); 
+}
+
+/* --- Input Area --- */
+.input-area { 
+    display: flex; 
+    flex-direction: column; 
+    padding: 15px; 
+    background-color: var(--neumorphic-bg); 
+    box-shadow: var(--outer-shadow-embossed);
+    flex-shrink: 0;
+    gap: 8px;
+}
+
+.model-select-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+#model-select-dropdown {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--neumorphic-bg);
+    box-shadow: var(--inner-shadow-recessed);
+    color: #444;
+    cursor: pointer;
+    appearance: none;
+    font-size: 0.95em;
+}
+
+.input-controls {
+    display: flex;
+    align-items: flex-end; /* Align buttons and textarea bottom */
+    gap: 10px;
+}
+
+/* TEXTAREA */
+#user-input { 
+    flex-grow: 1; 
+    padding: 12px 18px; 
+    border: none; 
+    border-radius: var(--input-radius); 
+    font-size: 1em; 
+    font-family: inherit; 
+    background-color: var(--neumorphic-bg); 
+    box-shadow: var(--inner-shadow-recessed); 
+    resize: none; 
+    min-height: 48px; 
+    max-height: 150px; 
+    overflow-y: auto; 
+    color: #333;
+    line-height: 1.4;
+    transition: all 0.2s;
+}
+
+#user-input:focus {
+    outline: none;
+    box-shadow: var(--inner-shadow-recessed), 0 0 0 1px var(--main-color);
+}
+
+/* SEND & UPLOAD BUTTONS - Updated Block */
+.send-button, .upload-button { 
+    background-color: var(--secondary-color); 
+    color: white;
+    font-size: 1.2em; 
+    border: none; 
+    border-radius: var(--input-radius); /* Use the larger, rounded corner for both by default */
+    box-shadow: 4px 4px 8px rgba(40, 167, 69, 0.4), -4px -4px 8px var(--shadow-light); 
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px; /* Add padding for text */
+}
+
+.send-button:active:not(:disabled), .upload-button:active:not(:disabled) { 
+    box-shadow: var(--inner-shadow-recessed); 
+    background-color: #218838;
+    transform: scale(0.95); 
+}
+
+.send-button:disabled, .upload-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: 2px 2px 4px var(--shadow-dark);
+}
+
+/* FILE DISPLAY AREA */
+.file-display-area {
+    display: none; /* Controlled by JS */
+    align-items: center;
+    padding: 8px 15px;
+    background-color: #f0f5fa;
+    border-radius: 12px;
+    box-shadow: var(--inner-shadow-recessed);
+    font-size: 0.9em;
+    color: #555;
+    margin-top: 5px;
+}
+
+#selected-file-name {
+    flex-grow: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-right: 10px;
+}
+
+.clear-file-button {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 0 5px;
+    flex-shrink: 0;
+    transition: color 0.2s;
+}
+
+.clear-file-button:hover {
+    color: #c82333;
+}
+
+/* --- Context Menu Styles --- */
+#context-menu {
+    position: absolute;
+    background-color: var(--neumorphic-bg);
+    border-radius: var(--radius);
+    padding: 5px;
+    box-shadow: var(--outer-shadow-embossed);
+    display: none;
+    z-index: 1000;
+    min-width: 150px;
+}
+
+#context-menu button {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    text-align: left;
+    border: none;
+    border-radius: 8px;
+    background: none;
+    color: #444;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+}
+
+#context-menu button:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    color: var(--main-color);
+}
+
+/* --- MODAL STYLES (Adjusted for Neumorphism) --- */
+/* The HTML uses IDs like custom-confirm-modal, but this targets the dialog box inside the JS logic, which is fine for visibility control */
+#custom-confirm-modal, #custom-prompt-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: none; /* Controlled by JS */
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modal-content {
+    background-color: var(--neumorphic-bg);
+    border-radius: var(--radius);
+    padding: 30px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: var(--outer-shadow-embossed);
+    text-align: center;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.modal-content p {
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+}
+
+.modal-buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-buttons .confirm-btn {
+    background-color: var(--main-color);
+    color: white;
+    box-shadow: 3px 3px 6px rgba(0, 123, 255, 0.4), -3px -3px 6px var(--shadow-light);
+}
+
+.modal-buttons .confirm-btn:active {
+    box-shadow: var(--inner-shadow-recessed);
+}
+
+.modal-buttons .cancel-btn {
+    background-color: var(--neumorphic-bg);
+    color: #444;
+    box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+}
+
+.modal-buttons .cancel-btn:active {
+    box-shadow: var(--inner-shadow-recessed);
+}
+
+#prompt-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 8px;
+    box-sizing: border-box;
+    background-color: var(--neumorphic-bg);
+    box-shadow: var(--inner-shadow-recessed);
+    color: #333;
+}
+
+/* --- Media Query --- */
+@media (max-width: 768px) { 
+    .sidebar { 
+        width: 100%;
+        height: auto;
+        border-right: none;
+        box-shadow: none;
+        order: -1; /* Place sidebar at the top if visible */
+    } 
+    .app-container {
+        flex-direction: column;
+    }
+    .chat-box {
+        padding-bottom: 120px; /* Make sure chat is visible above input area */
+    }
+}</style>
 </head>
 <body>
 
-    <div class="start-page" id="start-page">
-        <div class="welcome-box">
-            <h1>Welcome to Starlighter</h1>
-            <p style="color:#555; margin-bottom: 30px;">
-                Please select an AI model to begin your persistent chat session.
-            </p>
-
-            <div class="model-selector-container" id="model-selector-container">
-                </div>
-            
-            <p id="api-status" style="margin-top: 25px; font-size: 0.9em; color: gray;">
-                Initializing...
-            </p>
-        </div>
+    <div id="context-menu" class="context-menu">
+        <button data-action="edit">Edit Title</button>
+        <button data-action="delete">Delete Chat</button>
     </div>
 
-    <div class="flex-container" id="main-chat-container">
-        
-        <div class="sidebar">
-            <button class="new-chat-button" onclick="startNewChat()">
-                + New Chat
-            </button>
-            
-            <h4>Recent Chats</h4>
-            <div class="chat-list" id="chat-list">
-                </div>
-
-            <div class="model-info">
-                <strong>Model:</strong> <span id="displayed-model">Loading...</span><br>
-                Powered by StarlightGG
-            </div>
-        </div>
-
-        <div class="main-chat-area">
-            <div class="chat-header">
-                <div class="header-title">
-                    <h3>Starlighter</h3>
-                </div>
-            </div>
-            
-            <div class="chat-box" id="chat-box">
-                </div>
-            
-            <div class="input-area">
-                
-                <div class="model-select-container">
-                    <label for="model-select-dropdown">Model:</label>
-                    <select id="model-select-dropdown" class="model-select" onchange="selectModel(this.value)" disabled>
-                        </select>
-                </div>
-
-                <div class="input-and-select-row">
-<textarea id="user-input" class="user-input" placeholder="Ask a question..." rows="1"></textarea>                    <button onclick="sendMessage()" id="send-button" disabled>Send</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="context-menu">
-        <button data-action="edit">✏️ Edit Name</button>
-        <button data-action="delete" class="delete-option">🗑️ Delete Chat</button>
-    </div>
-
-    <div id="custom-confirm-modal" class="modal-backdrop" style="display:none;">
-        <div class="modal-dialog">
-            <h3 id="confirm-title">Confirm Action</h3>
-            <p id="confirm-message">Are you sure you want to proceed?</p>
+    <div id="custom-confirm-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="confirm-title">Confirm</h3>
+            <p id="confirm-message">Are you sure?</p>
             <div class="modal-buttons">
                 <button class="cancel-btn" data-confirm-response="false">Cancel</button>
                 <button class="confirm-btn" data-confirm-response="true">OK</button>
             </div>
         </div>
     </div>
-    
-    <div id="custom-prompt-modal" class="modal-backdrop" style="display:none;">
-        <div class="modal-dialog">
-            <h3 id="prompt-title">Enter Value</h3>
-            <p id="prompt-message">Please enter the new chat title:</p>
-            <div class="modal-input">
-                <input type="text" id="prompt-input" value="">
-            </div>
+
+    <div id="custom-prompt-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="prompt-title">Input</h3>
+            <p id="prompt-message">Enter value:</p>
+            <input type="text" id="prompt-input">
             <div class="modal-buttons">
                 <button class="cancel-btn" data-prompt-response="false">Cancel</button>
                 <button class="confirm-btn" data-prompt-response="true">Save</button>
             </div>
         </div>
     </div>
+    
+    <div class="app-container">
+        
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Starlighter AI</h2>
+            </div>
+            <button id="new-chat-button" class="new-chat-button">
+                + New Chat
+            </button>
+            <div id="chat-list" class="chat-list">
+                </div>
+            <div class="sidebar-footer">
+                <p>Model: <span id="displayed-model">Loading...</span></p>
+                <p>Status: <span id="api-status">Loading API Key...</span></p>
+            </div>
+        </div>
 
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <div class="main-content">
+            
+            <div id="start-page" class="start-page">
+                <h1>Welcome!</h1>
+                <p>Select a model to start a conversation.</p>
+                <div id="model-selector-container" class="model-selector-container">
+                    </div>
+            </div>
+
+            <div id="main-chat-container" class="chat-container">
+                
+                <div id="chat-box" class="chat-box">
+                    </div>
+
+                <div class="input-area">
+                    
+                    <div class="model-select-bar">
+                        <label for="model-select-dropdown">Current Model:</label>
+                        <select id="model-select-dropdown" onchange="selectModel(this.value)" disabled>
+                            </select>
+                    </div>
+
+                    <div class="input-controls">
+                        
+                        <input type="file" id="image-file-input" accept="image/jpeg,image/png,image/webp" style="display:none;">
+                        
+                        <button id="file-upload-button" class="upload-button" style="display:none;" title="Upload Image (Multimodal Models Only)">
+                            🖼️
+                        </button>
+                        
+                        <textarea id="user-input" placeholder="Type your message here..." rows="1" disabled></textarea>
+                        
+                        <button id="send-button" class="send-button" disabled>Send</button>
+                    </div>
+                    
+                    <div id="file-display-area" class="file-display-area" style="display:none;">
+                        <span id="selected-file-name">No file selected</span>
+                        <button id="clear-file-button" class="clear-file-button">X</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <script>
-    // 🛑 🛑 🛑 WARNING: This method exposes your key via network inspection! 🛑 🛑 🛑
-    // Use a secure backend proxy for production environments.
+        // 🛑 🛑 🛑 WARNING: This method exposes your key via network inspection! 🛑 🛑 🛑
+        // Use a secure backend proxy for production environments.
 
-    // --- Configuration ---
-    const API_KEY_URL = "https://starlightgg.github.io/T.txt"; 
-    const LOCAL_STORAGE_KEY = "starlighter_chats"; 
-    
-    const MODELS = {
-        'gpt-oss-20b': { name: "Chat-GPT OSS 20" , id: "openai/gpt-oss-20b" },
-        'compound-mini': { name: "Compound mini (Groq)", id: "groq/compound-mini" },
-        'llama3.1-8b': { name: "Llama AI 3.1", id: "llama-3.1-8b-instant" }
-    };
-    const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
-
-    // 🛑 MODIFICATION 1: TEMPLATE FUNCTION FOR SYSTEM PROMPT
-    const BASE_SYSTEM_PROMPT_CONTENT = "You are a helpful and fast AI assistant powered by StarlightGG. You are currently running on the [MODEL_NAME] model. Keep your responses concise.";
-
-    function getModelSystemPrompt(modelName = CURRENT_MODEL.name) {
-        return { 
-            "role": "system", 
-            "content": BASE_SYSTEM_PROMPT_CONTENT.replace('[MODEL_NAME]', modelName) 
+        // --- Configuration ---
+        const API_KEY_URL = "https://starlightgg.github.io/T.txt"; 
+        const LOCAL_STORAGE_KEY = "starlighter_chats"; 
+        
+        // 💡 MODIFICATION 1: ADD Multimodal Property to vision models
+        const MODELS = {
+            'gpt-oss-20b': { name: "Chat-GPT OSS 20" , id: "openai/gpt-oss-20b" },
+            'compound-mini': { name: "Compound mini (Groq)", id: "groq/compound-mini" },
+            'llama3.1-8b': { name: "Llama AI 3.1", id: "llama-3.1-8b-instant" },
+            'llama4-scout': { name: "Llama 4 Scout (Vision)", id: "meta-llama/llama-4-scout-17b-16e-instruct", multimodal: true }
         };
-    }
-    // ------------------------------------------------------------------
+        const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 
-    let GROQ_API_KEY = null; 
-    let CURRENT_MODEL = MODELS['gpt-oss-20b']; 
-    
-    // --- State Management ---
-    const startPage = document.getElementById('start-page');
-    const mainChatContainer = document.getElementById('main-chat-container');
-    const modelSelectorContainer = document.getElementById('model-selector-container'); 
-    const modelSelectDropdown = document.getElementById('model-select-dropdown'); 
-    const apiStatus = document.getElementById('api-status');
-    const chatBox = document.getElementById('chat-box');
-    const userInput = document.getElementById('user-input');
-    const sendButton = document.getElementById('send-button');
-    const chatListContainer = document.getElementById('chat-list');
-    const modelDisplay = document.getElementById('displayed-model'); 
-    const contextMenu = document.getElementById('context-menu'); 
-    
-    // Modal elements
-    const confirmModal = document.getElementById('custom-confirm-modal');
-    const promptModal = document.getElementById('custom-prompt-modal');
-    const promptInput = document.getElementById('prompt-input');
+        // --- System Prompt Setup ---
+        const BASE_SYSTEM_PROMPT_CONTENT = "You are a helpful and fast AI assistant powered by StarlightGG. You are currently running on the [MODEL_NAME] model. Keep your responses concise.";
 
-    let allChatHistories = {};
-    let currentChatId = 'chat-0'; 
-    let chatCounter = 0;
-    let contextMenuTargetChatId = null; 
-
-    // --- UI Control Functions ---
-    
-    function showStartPage() {
-        startPage.style.display = 'flex';
-        mainChatContainer.style.display = 'none';
-    }
-
-    function showChatInterface() {
-        startPage.style.display = 'none';
-        mainChatContainer.style.display = 'flex';
-        userInput.focus();
-    }
-
-    function hideContextMenu() { 
-        contextMenu.style.display = 'none';
-        contextMenuTargetChatId = null;
-    }
-    
-    // --- MODAL FUNCTIONS ---
-    
-    /**
-     * Shows a custom confirmation dialog.
-     * @param {string} title - The title of the dialog.
-     * @param {string} message - The message body.
-     * @returns {Promise<boolean>} Resolves with true if confirmed, false if cancelled.
-     */
-    function showCustomConfirm(title, message) {
-        return new Promise(resolve => {
-            document.getElementById('confirm-title').textContent = title;
-            document.getElementById('confirm-message').textContent = message;
-            confirmModal.style.display = 'flex';
-
-            const confirmButtons = confirmModal.querySelectorAll('.modal-buttons button');
-            
-            const handleConfirmClick = (event) => {
-                const response = event.target.dataset.confirmResponse === 'true';
-                
-                // Cleanup listeners
-                confirmButtons.forEach(btn => btn.removeEventListener('click', handleConfirmClick));
-                confirmModal.style.display = 'none';
-                resolve(response);
+        function getModelSystemPrompt(modelName = CURRENT_MODEL.name) {
+            return { 
+                "role": "system", 
+                "content": BASE_SYSTEM_PROMPT_CONTENT.replace('[MODEL_NAME]', modelName) 
             };
-
-            confirmButtons.forEach(btn => btn.addEventListener('click', handleConfirmClick));
-        });
-    }
-    
-    /**
-     * Shows a custom prompt dialog.
-     * @param {string} title - The title of the dialog.
-     * @param {string} message - The message body.
-     * @param {string} defaultValue - The default text value for the input.
-     * @returns {Promise<string|null>} Resolves with the input string or null if cancelled.
-     */
-    function showCustomPrompt(title, message, defaultValue) {
-        return new Promise(resolve => {
-            document.getElementById('prompt-title').textContent = title;
-            document.getElementById('prompt-message').textContent = message;
-            promptInput.value = defaultValue;
-            promptModal.style.display = 'flex';
-            promptInput.focus();
-            
-            // Select all text in input
-            promptInput.select();
-
-            const promptButtons = promptModal.querySelectorAll('.modal-buttons button');
-            
-            const handlePromptClick = (event) => {
-                const responseType = event.target.dataset.promptResponse;
-                
-                // Cleanup listeners
-                promptButtons.forEach(btn => btn.removeEventListener('click', handlePromptClick));
-                promptInput.removeEventListener('keydown', handlePromptKeydown);
-                promptModal.style.display = 'none';
-
-                if (responseType === 'true') {
-                    const finalValue = promptInput.value.trim();
-                    resolve(finalValue || null); 
-                } else {
-                    resolve(null); // Cancelled
-                }
-            };
-
-            const handlePromptKeydown = (event) => {
-                if (event.key === 'Enter') {
-                    event.preventDefault(); 
-                    // Simulate click on the 'Save' button
-                    promptModal.querySelector('.confirm-btn').click();
-                } else if (event.key === 'Escape') {
-                     event.preventDefault();
-                    // Simulate click on the 'Cancel' button
-                    promptModal.querySelector('.cancel-btn').click();
-                }
-            };
-
-            promptButtons.forEach(btn => btn.addEventListener('click', handlePromptClick));
-            promptInput.addEventListener('keydown', handlePromptKeydown);
-        });
-    }
-    
-    // --- Model Selection and Initialization ---
-
-    function populateModelSelector() {
-        modelSelectorContainer.innerHTML = '';
-        modelSelectDropdown.innerHTML = '';
-        
-        Object.keys(MODELS).forEach(key => {
-            const model = MODELS[key];
-            
-            const option = document.createElement('option');
-            option.value = key;
-            option.textContent = model.name;
-            modelSelectDropdown.appendChild(option);
-
-            const button = document.createElement('button');
-            button.className = 'model-button';
-            button.dataset.modelKey = key;
-            button.textContent = model.name;
-            button.onclick = (e) => selectModel(key, true, e.target); 
-            modelSelectorContainer.appendChild(button);
-        });
-    }
-/**
-     * Disables the model selection dropdown if a conversation has already started.
-     */
-    function toggleModelSelectorLock() {
-        const history = allChatHistories[currentChatId];
-        
-        // If history exists and has more than 1 entry (i.e., user sent a message)
-        const shouldBeLocked = history && history.length > 1; 
-        
-        modelSelectDropdown.disabled = shouldBeLocked;
-    }
-
-function selectModel(modelKey, isInitialSelection = false, targetButton = null) {
-    const previousModel = CURRENT_MODEL;
-    
-    // Find model by key or fall back to current
-    const modelObject = MODELS[modelKey] || CURRENT_MODEL;
-    CURRENT_MODEL = modelObject;
-    localStorage.setItem('starlighter_model_key', modelKey); 
-
-    // Update UI components
-    modelDisplay.textContent = CURRENT_MODEL.name;
-    modelSelectDropdown.value = modelKey;
-    
-    // 💡 FIX: Update system prompt in CURRENT chat history if the model actually changed
-    if (previousModel.id !== CURRENT_MODEL.id) {
-        const currentHistory = allChatHistories[currentChatId];
-        if (currentHistory && currentHistory.length > 0) {
-            // Replace the old system prompt with one containing the new model name
-            currentHistory[0] = getModelSystemPrompt(CURRENT_MODEL.name);
-            saveStateToLocalStorage();
-        }
-    }
-
-    if (isInitialSelection) {
-        document.querySelectorAll('.model-button').forEach(btn => {
-            btn.classList.remove('selected');
-        });
-        if (targetButton) {
-            targetButton.classList.add('selected');
         }
 
-        setTimeout(showChatInterface, 300);
-    } else {
-        // Re-render the current chat to show the welcome prompt update (if applicable)
-        renderCurrentChat(); 
-    }
-}
-    
-    // --- Local Storage Functions ---
-
-    function saveStateToLocalStorage() {
-        const state = {
-            histories: allChatHistories,
-            counter: chatCounter,
-            currentId: currentChatId
-        };
-        try {
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
-        } catch (e) {
-            console.error("Error saving to local storage:", e);
-        }
-    }
-
-    function loadStateFromLocalStorage() {
-        try {
-            const storedState = localStorage.getItem(LOCAL_STORAGE_KEY);
-            if (storedState) {
-                const state = JSON.parse(storedState);
-                allChatHistories = state.histories || {};
-                chatCounter = state.counter || 0;
-                currentChatId = state.currentId || 'chat-0';
-
-                if (Object.keys(allChatHistories).length > 0 && !allChatHistories[currentChatId]) {
-                    currentChatId = Object.keys(allChatHistories)[0];
-                }
-            }
-
-            const savedModelKey = localStorage.getItem('starlighter_model_key') || Object.keys(MODELS)[0];
-            if (MODELS[savedModelKey]) {
-                 CURRENT_MODEL = MODELS[savedModelKey];
-            }
-            
-            return Object.keys(allChatHistories).length > 0;
-
-        } catch (e) {
-            console.error("Error loading from local storage:", e);
-            localStorage.removeItem(LOCAL_STORAGE_KEY);
-            return false;
-        }
-    }
-
-    // --- Chat Lifecycle Functions ---
-
-    function renderCurrentChat() {
-        const history = allChatHistories[currentChatId];
-        chatBox.innerHTML = ''; 
-
-        if (!history || history.length <= 1) { 
-            const promptDiv = document.createElement('div');
-            promptDiv.className = 'welcome-prompt';
-            promptDiv.innerHTML = `<h1>Starlighter</h1><p>Using ${CURRENT_MODEL.name}. Ask a question to start a new conversation.</p>`;
-            chatBox.appendChild(promptDiv);
-        } else {
-            // history.slice(1) to skip the system prompt at index 0
-            history.slice(1).forEach(msg => { 
-                addMessage(msg.role, msg.content, chatBox);
-            });
-        }
-        toggleModelSelectorLock();
-        userInput.focus();
-    }
-
-    function createNewChatObject(id, title) {
-        // 🛑 MODIFICATION 2: Use the current global model name when creating the chat
-        const newHistory = [getModelSystemPrompt(CURRENT_MODEL.name)];
-        allChatHistories[id] = newHistory;
+        let GROQ_API_KEY = null; 
+        let CURRENT_MODEL = MODELS['gpt-oss-20b']; 
         
-        saveStateToLocalStorage();
-        return newHistory;
-    }
-
-    function updateChatTitle(id, newTitle) {
-        const chatItem = document.querySelector(`.chat-item[data-chat-id="${id}"]`);
-        if (chatItem) {
-            const displayedTitle = newTitle.length > 50 ? newTitle.substring(0, 47).trim() + '...' : newTitle;
-            chatItem.textContent = displayedTitle;
-            saveStateToLocalStorage();
-        }
-    }
-
-    function startNewChat() {
-        chatCounter++;
-        currentChatId = `chat-${chatCounter}`;
+        // --- State Management ---
+        const startPage = document.getElementById('start-page');
+        const mainChatContainer = document.getElementById('main-chat-container');
+        const modelSelectorContainer = document.getElementById('model-selector-container'); 
+        const modelSelectDropdown = document.getElementById('model-select-dropdown'); 
+        const apiStatus = document.getElementById('api-status');
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const chatListContainer = document.getElementById('chat-list');
+        const modelDisplay = document.getElementById('displayed-model'); 
+        const contextMenu = document.getElementById('context-menu'); 
+        const newChatButton = document.getElementById('new-chat-button');
         
-        createNewChatObject(currentChatId, `New Chat ${chatCounter}`);
+        // 💡 File Upload Elements & State
+        const imageFileInput = document.getElementById('image-file-input');
+        const fileUploadButton = document.getElementById('file-upload-button');
+        const fileDisplayArea = document.getElementById('file-display-area');
+        const selectedFileName = document.getElementById('selected-file-name');
+        const clearFileButton = document.getElementById('clear-file-button');
+        let selectedFile = null; 
+
+        // Modal elements
+        const confirmModal = document.getElementById('custom-confirm-modal');
+        const promptModal = document.getElementById('custom-prompt-modal');
+        const promptInput = document.getElementById('prompt-input');
+
+        // 💡 Global State Variables: Chat structure is now an object for title/history tracking
+        // allChatHistories = { "chat-1": { title: "...", history: [...] }, ... }
+        let allChatHistories = {};
+        let currentChatId = 'chat-0'; 
+        let chatCounter = 0;
+        let imageAnalysisCounter = 0; // 💡 NEW: Separate counter for image analysis chats
+        let contextMenuTargetChatId = null; 
+
+        // --- UI Control Functions (Unchanged) ---
         
-        renderSidebar();
-        
-        document.querySelectorAll('.chat-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        const newItem = document.querySelector(`.chat-item[data-chat-id="${currentChatId}"]`);
-        if (newItem) newItem.classList.add('active'); 
-
-        renderCurrentChat();
-    }
-    
-    function loadChat(chatId) {
-        if (currentChatId === chatId) return; 
-
-        currentChatId = chatId;
-        saveStateToLocalStorage();
-
-        // 🛑 MODIFICATION 3: Find the model for this chat history and revert state
-        const history = allChatHistories[chatId];
-        let modelKeyToLoad = Object.keys(MODELS)[0]; // Default to first model
-
-        if (history && history.length > 0 && history[0].role === 'system') {
-            const promptContent = history[0].content;
-            
-            // 1. Extract the Model Name from the system prompt (using the pattern [MODEL_NAME] model)
-            const match = promptContent.match(/currently running on the (.*?) model\./);
-            
-            if (match && match[1]) {
-                const modelNameInHistory = match[1].trim();
-                
-                // 2. Find the model key (e.g., 'llama3.1-8b') that matches the name
-                const modelKey = Object.keys(MODELS).find(key => MODELS[key].name === modelNameInHistory);
-
-                if (modelKey) {
-                    modelKeyToLoad = modelKey;
-                }
-            }
-        }
-        
-        // 3. Set the global model and update the dropdown/footer display
-        // Calling selectModel() handles both global state (CURRENT_MODEL) and UI update.
-        selectModel(modelKeyToLoad); 
-
-
-        document.querySelectorAll('.chat-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        document.querySelector(`.chat-item[data-chat-id="${chatId}"]`).classList.add('active');
-        
-        // renderCurrentChat() is now called inside selectModel()
-    }
-
-    function renderSidebar() {
-        chatListContainer.innerHTML = ''; 
-        
-        const sortedChatIds = Object.keys(allChatHistories).sort((a, b) => {
-            return parseInt(b.split('-')[1]) - parseInt(a.split('-')[1]);
-        });
-
-        sortedChatIds.forEach(id => {
-            const history = allChatHistories[id];
-            
-            let title = `Chat ${id.split('-')[1]}`; 
-            const firstUserMsg = history.find(msg => msg.role === 'user');
-            if (firstUserMsg) {
-                title = firstUserMsg.content; 
-            }
-
-            const chatItem = document.createElement('div');
-            chatItem.className = `chat-item ${id === currentChatId ? 'active' : ''}`;
-            chatItem.dataset.chatId = id;
-            chatItem.textContent = title.length > 50 ? title.substring(0, 47).trim() + '...' : title;
-            
-            chatItem.onclick = () => loadChat(id); 
-            
-            // Right-Click/Context Menu Listener - ATTACHED ON CREATION
-            chatItem.addEventListener('contextmenu', function(event) {
-                event.preventDefault(); 
-                contextMenuTargetChatId = id; 
-                contextMenu.style.top = `${event.clientY}px`;
-                contextMenu.style.left = `${event.clientX}px`;
-                contextMenu.style.display = 'block';
-            });
-
-            chatListContainer.appendChild(chatItem);
-        });
-    }
-    
-    // --- Context Menu Delegation Handlers ---
-
-    async function handleDeleteChat() {
-        const chatIdToDelete = contextMenuTargetChatId;
-        
-        if (!chatIdToDelete) return; 
-        
-        // 🚨 Use custom confirm 🚨
-        const confirmed = await showCustomConfirm(
-            "Confirm Deletion", 
-            `Are you sure you want to delete chat ${chatIdToDelete}? This action cannot be undone.`
-        );
-        
-        if (!confirmed) {
-            return;
+        function showStartPage() {
+            startPage.style.display = 'flex';
+            mainChatContainer.style.display = 'none';
         }
 
-        delete allChatHistories[chatIdToDelete];
-        
-        const remainingChatIds = Object.keys(allChatHistories);
-        
-        if (currentChatId === chatIdToDelete) {
-            if (remainingChatIds.length > 0) {
-                currentChatId = remainingChatIds[0];
-            } else {
-                chatCounter++;
-                currentChatId = `chat-${chatCounter}`;
-                createNewChatObject(currentChatId, `New Chat ${chatCounter}`);
-            }
-        }
-
-        renderSidebar();
-        renderCurrentChat();
-        saveStateToLocalStorage();
-    }
-
-    async function handleEditChatTitle() {
-        const chatIdToEdit = contextMenuTargetChatId;
-        
-        const chatItem = document.querySelector(`.chat-item[data-chat-id="${chatIdToEdit}"]`);
-        if (!chatIdToEdit || !chatItem) return;
-
-        const currentTitle = chatItem.textContent.replace('...', '').trim();
-        
-        // 🚨 Use custom prompt and capture new value 🚨
-        const newTitle = await showCustomPrompt(
-            "Edit Chat Title", 
-            `Enter a new title for chat ${chatIdToEdit}:`, 
-            currentTitle
-        );
-
-        // If user cancels or enters empty string, newTitle will be null or empty string (handled by showCustomPrompt)
-        if (newTitle && newTitle.trim()) {
-            const history = allChatHistories[chatIdToEdit];
-            const cleanNewTitle = newTitle.trim();
-            
-            const firstUserMsgIndex = history.findIndex(msg => msg.role === 'user');
-            
-            if (firstUserMsgIndex !== -1) {
-                history[firstUserMsgIndex].content = cleanNewTitle;
-            } else {
-                // Fallback in case history is just the system prompt
-                history.push({ "role": "user", "content": cleanNewTitle });
-            }
-
-            updateChatTitle(chatIdToEdit, cleanNewTitle);
-            renderSidebar(); 
-        }
-    }
-    
-    // --- Setup Event Listeners after DOM loads ---
-    document.addEventListener('DOMContentLoaded', () => {
-        
-        // CRITICAL FIX: Event Delegation on the context menu parent with Stop Propagation
-        contextMenu.addEventListener('click', (event) => {
-            event.stopPropagation(); // Stop click from propagating to the document and hiding the menu prematurely
-            
-            const button = event.target.closest('button');
-            if (!button) return; 
-            
-            const action = button.dataset.action;
-            
-            if (action === 'edit') {
-                handleEditChatTitle();
-            } else if (action === 'delete') {
-                handleDeleteChat();
-            }
-            
-            // Hide the menu *after* the action logic has started (it will wait for the modal promise)
-            hideContextMenu();
-        });
-
-        // Global listener to hide context menu if the user clicks anywhere else
-        document.addEventListener('click', hideContextMenu);
-        document.addEventListener('contextmenu', (e) => {
-            if (!e.target.closest('.chat-item')) {
-                 hideContextMenu();
-            }
-        });
-        
-        // Start the key loading process
-        loadApiKey();
-    });
-
-
-    // --- Utility Functions ---
-    function scrollToBottom() {
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-function addMessage(role, content, targetElement = chatBox) {
-        const msgDiv = document.createElement('div');
-        
-        // 💡 CRITICAL FIX: Ensure valid role and apply class defensively
-        const safeRole = (role === 'user' || role === 'ai') ? role : 'ai';
-        
-        msgDiv.className = `message ${safeRole}-message`;
-        const contentToParse = content && typeof content === 'string' ? content : '...';
-        let renderedHtml;
-        
-        // This entire block relies on marked.js being defined.
-        if (typeof marked !== 'undefined' && typeof marked.parse === 'function') {
-            // Decode the content before parsing to handle HTML-encoded characters from the textarea.
-            const decodedContent = new DOMParser().parseFromString(contentToParse, 'text/html').documentElement.textContent;
-            
-            renderedHtml = marked.parse(decodedContent);
-        } else {
-            // Fallback 
-            renderedHtml = contentToParse.replace(/\n/g, '<br>');
-        }
-        msgDiv.innerHTML = renderedHtml;
-        targetElement.appendChild(msgDiv);
-        scrollToBottom();
-        
-        return msgDiv;
-    }
-
-    // --- API Key Loading ---
-    async function loadApiKey() {
-        const hasExistingChats = loadStateFromLocalStorage();
-        populateModelSelector(); 
-        // Ensure initial model is set based on local storage or default
-        selectModel(Object.keys(MODELS).find(key => MODELS[key].id === CURRENT_MODEL.id) || Object.keys(MODELS)[0]);
-
-        if (Object.keys(allChatHistories).length === 0) {
-            createNewChatObject('chat-0', 'Initial Chat');
-            currentChatId = 'chat-0';
-        }
-
-        renderSidebar();
-        
-        showStartPage();
-        apiStatus.textContent = 'Fetching API Key...';
-        try {
-            const response = await fetch(API_KEY_URL);
-            if (!response.ok) throw new Error(`HTTP Status: ${response.status}`);
-            GROQ_API_KEY = (await response.text()).trim();
-            
-            if (GROQ_API_KEY.length < 10) throw new Error("Key is too short or invalid.");
-
-            apiStatus.textContent = 'API Key loaded successfully.';
-            
-            modelSelectDropdown.disabled = false;
-            sendButton.disabled = false;
-            userInput.disabled = false;
-            
-            document.querySelectorAll('.model-button').forEach(btn => btn.style.pointerEvents = 'auto');
-
-            if (hasExistingChats) {
-                showChatInterface();
-            } else {
-                const initialModelKey = Object.keys(MODELS).find(key => MODELS[key].id === CURRENT_MODEL.id);
-                if (initialModelKey) {
-                    const btn = document.querySelector(`.model-button[data-model-key="${initialModelKey}"]`);
-                    if(btn) btn.classList.add('selected');
-                }
-            }
-        } catch (error) {
-            console.error('Groq API Key Loading Error:', error);
-            apiStatus.innerHTML = `<span style="color:red;">Error: Could not load API Key. (${error.message})</span>`;
-        }
-        toggleModelSelectorLock();
-
-    }
-    
-async function sendMessage() {
-    
-        const userText = userInput.value.trim();
-        if (!userText || !GROQ_API_KEY) return;
-        
-        const currentHistory = allChatHistories[currentChatId];
-        const isFirstMessage = currentHistory.length === 1; 
-
-        userInput.value = '';
-        sendButton.disabled = true;
-        userInput.disabled = true;
-        modelSelectDropdown.disabled = true;
-
-        
-        // 1. Add User Message (Appended directly to the chatBox)
-        addMessage('user', userText); 
-        currentHistory.push({ "role": "user", "content": userText });
-        
-        if (isFirstMessage) {
-            updateChatTitle(currentChatId, userText); 
-            renderSidebar(); 
-        }
-
-        // 2. Add AI Placeholder Message (Appended directly to the chatBox)
-        const aiMessageElement = addMessage('ai', 'Thinking...'); 
-
-        try {
-            const response = await fetch(GROQ_ENDPOINT, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${GROQ_API_KEY}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    model: CURRENT_MODEL.id, // CRITICAL: Uses the correctly synchronized CURRENT_MODEL.id
-                    messages: currentHistory, 
-                    temperature: 0.7,
-                    max_tokens: 500
-                })
-            });
-
-            if (!response.ok) {
-                let errorText = `HTTP Error: ${response.status} ${response.statusText}`;
-                try {
-                    const errorData = await response.json();
-                    if (errorData.error && errorData.error.message) errorText = errorData.error.message;
-                } catch (e) {}
-
-                const match = errorText.match(/Please try again in (\d+\.?\d*)s/);
-                if (match) throw new Error(`Rate Limit Exceeded. Try again in ${match[1]} seconds.`);
-                else throw new Error(errorText);
-            }
-
-            const data = await response.json();
-            
-            const assistantResponse = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content
-                ? data.choices[0].message.content
-                : "Sorry, I received an empty response from the API.";
-            const renderedHtml = (typeof marked !== 'undefined' && typeof marked.parse === 'function')
-                ? marked.parse(assistantResponse) // Use marked.parse for formatting
-                : assistantResponse.replace(/\n/g, '<br>'); // Fallback
-            
-            // 3. Update AI Placeholder with final response
-            aiMessageElement.innerHTML = renderedHtml;
-            currentHistory.push({ "role": "assistant", "content": assistantResponse });
-            
-            scrollToBottom();
-            saveStateToLocalStorage();
-
-        } catch (error) {
-            console.error('Groq API Call Failed:', error);
-            aiMessageElement.innerHTML = `<span style="color:red;">${error.message}</span>`;
-        } finally {
-            toggleModelSelectorLock();
-            sendButton.disabled = false;
-            userInput.disabled = false;
+        function showChatInterface() {
+            startPage.style.display = 'none';
+            mainChatContainer.style.display = 'flex';
             userInput.focus();
         }
-    }
-// Allow sending message by pressing Enter (without Shift) and a new line with Shift + Enter
-    userInput.addEventListener('keydown', function(event) {
-        // Check if the Enter key was pressed
-        if (event.key === 'Enter') {
-            // If the Shift key is NOT pressed, and the send button is not disabled:
-            if (!event.shiftKey && !sendButton.disabled) {
-                event.preventDefault(); // Prevent the default action 
-                sendMessage();
-            } 
-            // If Shift IS pressed, it allows a new line in the textarea
+
+        function hideContextMenu() { 
+            contextMenu.style.display = 'none';
+            contextMenuTargetChatId = null;
+        }
+        
+        // --- MODAL FUNCTIONS (Unchanged) ---
+        
+        function showCustomConfirm(title, message) {
+            return new Promise(resolve => {
+                document.getElementById('confirm-title').textContent = title;
+                document.getElementById('confirm-message').textContent = message;
+                confirmModal.style.display = 'flex';
+
+                const confirmButtons = confirmModal.querySelectorAll('.modal-buttons button');
+                
+                const handleConfirmClick = (event) => {
+                    const response = event.target.dataset.confirmResponse === 'true';
+                    confirmButtons.forEach(btn => btn.removeEventListener('click', handleConfirmClick));
+                    confirmModal.style.display = 'none';
+                    resolve(response);
+                };
+
+                confirmButtons.forEach(btn => btn.addEventListener('click', handleConfirmClick));
+            });
+        }
+        
+        function showCustomPrompt(title, message, defaultValue) {
+            return new Promise(resolve => {
+                document.getElementById('prompt-title').textContent = title;
+                document.getElementById('prompt-message').textContent = message;
+                promptInput.value = defaultValue;
+                promptModal.style.display = 'flex';
+                promptInput.focus();
+                
+                promptInput.select();
+
+                const promptButtons = promptModal.querySelectorAll('.modal-buttons button');
+                
+                const handlePromptClick = (event) => {
+                    const responseType = event.target.dataset.promptResponse;
+                    
+                    promptButtons.forEach(btn => btn.removeEventListener('click', handlePromptClick));
+                    promptInput.removeEventListener('keydown', handlePromptKeydown);
+                    promptModal.style.display = 'none';
+
+                    if (responseType === 'true') {
+                        const finalValue = promptInput.value.trim();
+                        resolve(finalValue || null); 
+                    } else {
+                        resolve(null); 
+                    }
+                };
+
+                const handlePromptKeydown = (event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault(); 
+                        promptModal.querySelector('.confirm-btn').click();
+                    } else if (event.key === 'Escape') {
+                        event.preventDefault();
+                        promptModal.querySelector('.cancel-btn').click();
+                    }
+                };
+
+                promptButtons.forEach(btn => btn.addEventListener('click', handlePromptClick));
+                promptInput.addEventListener('keydown', handlePromptKeydown);
+            });
+        }
+
+        // --- Model Selection and Initialization (Updated for file button visibility) ---
+
+        function populateModelSelector() {
+            modelSelectorContainer.innerHTML = '';
+            modelSelectDropdown.innerHTML = '';
+            
+            Object.keys(MODELS).forEach(key => {
+                const model = MODELS[key];
+                
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = model.name;
+                modelSelectDropdown.appendChild(option);
+
+                const button = document.createElement('button');
+                button.className = 'model-button';
+                button.dataset.modelKey = key;
+                button.textContent = model.name;
+                button.onclick = (e) => selectModel(key, true, e.target); 
+                modelSelectorContainer.appendChild(button);
+            });
+        }
+
+        function toggleModelSelectorLock() {
+            const history = allChatHistories[currentChatId] ? allChatHistories[currentChatId].history : [];
+            
+            const shouldBeLocked = history && history.length > 1; 
+            
+            modelSelectDropdown.disabled = shouldBeLocked;
+        }
+
+        function selectModel(modelKey, isInitialSelection = false, targetButton = null) {
+            const previousModel = CURRENT_MODEL;
+            
+            const modelObject = MODELS[modelKey] || CURRENT_MODEL;
+            CURRENT_MODEL = modelObject;
+            localStorage.setItem('starlighter_model_key', modelKey); 
+
+            // Update UI components
+            modelDisplay.textContent = CURRENT_MODEL.name;
+            modelSelectDropdown.value = modelKey;
+            
+            // 💡 NEW LOGIC FOR FILE UPLOAD BUTTON VISIBILITY
+            if (CURRENT_MODEL.multimodal) {
+                fileUploadButton.style.display = 'flex'; 
+            } else {
+                fileUploadButton.style.display = 'none';
+                // Also clear any selected file if we switch to a non-multimodal model
+                if (selectedFile) {
+                    clearSelectedFile();
+                }
+            }
+            
+            // Update system prompt in CURRENT chat history if the model actually changed
+            if (previousModel.id !== CURRENT_MODEL.id) {
+                const currentChatObject = allChatHistories[currentChatId];
+                if (currentChatObject && currentChatObject.history && currentChatObject.history.length > 0) {
+                    currentChatObject.history[0] = getModelSystemPrompt(CURRENT_MODEL.name);
+                    saveStateToLocalStorage();
+                }
+            }
+
+            if (isInitialSelection) {
+                document.querySelectorAll('.model-button').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                if (targetButton) {
+                    targetButton.classList.add('selected');
+                }
+
+                setTimeout(showChatInterface, 300);
+            } else {
+                renderCurrentChat(); 
+            }
+        }
+            
+        // --- Local Storage Functions (Updated for new chat structure) ---
+
+function saveStateToLocalStorage() {
+    // Recalculate image analysis counter before saving
+    imageAnalysisCounter = 0;
+    
+    Object.keys(allChatHistories).forEach(id => {
+        const chatObject = allChatHistories[id];
+        
+        // 💡 FIX: Ensure chatObject.title exists AND is a string before calling startsWith
+        if (typeof chatObject.title === 'string' && chatObject.title.startsWith('Image Analysis')) { 
+             const num = parseInt(chatObject.title.split(' ')[2]);
+             if (!isNaN(num) && num > imageAnalysisCounter) {
+                 imageAnalysisCounter = num;
+             }
         }
     });
-</script>
+
+    const state = {
+        histories: allChatHistories,
+        counter: chatCounter,
+        currentId: currentChatId,
+        imageCounter: imageAnalysisCounter
+    };
+    try {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+        console.error("Error saving to local storage:", e);
+    }
+}
+
+        function loadStateFromLocalStorage() {
+            try {
+                const storedState = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (storedState) {
+                    const state = JSON.parse(storedState);
+                    // Ensure backward compatibility: convert old array-only histories to objects
+                    const loadedHistories = {};
+                    for (const id in state.histories) {
+                        const item = state.histories[id];
+                        if (Array.isArray(item)) {
+                            // Old structure: just an array of messages. Infer title from first user message.
+                            const firstUserMsg = item.find(msg => msg.role === 'user');
+                            loadedHistories[id] = {
+                                history: item,
+                                title: firstUserMsg ? firstUserMsg.content : `Chat ${id.split('-')[1]}`
+                            };
+                        } else {
+                            // New structure: object with title and history.
+                            loadedHistories[id] = item;
+                        }
+                    }
+
+                    allChatHistories = loadedHistories;
+                    chatCounter = state.counter || 0;
+                    currentChatId = state.currentId || 'chat-0';
+                    imageAnalysisCounter = state.imageCounter || 0; // Load the new counter
+
+                    if (Object.keys(allChatHistories).length > 0 && !allChatHistories[currentChatId]) {
+                        currentChatId = Object.keys(allChatHistories)[0];
+                    }
+                }
+
+                const savedModelKey = localStorage.getItem('starlighter_model_key') || Object.keys(MODELS)[0];
+                if (MODELS[savedModelKey]) {
+                    CURRENT_MODEL = MODELS[savedModelKey];
+                }
+                
+                return Object.keys(allChatHistories).length > 0;
+
+            } catch (e) {
+                console.error("Error loading from local storage:", e);
+                localStorage.removeItem(LOCAL_STORAGE_KEY);
+                return false;
+            }
+        }
+
+        // --- Chat Lifecycle Functions (Updated for new chat structure) ---
+
+        function renderCurrentChat() {
+            const chatObject = allChatHistories[currentChatId];
+            const history = chatObject ? chatObject.history : [];
+            chatBox.innerHTML = ''; 
+
+            if (!history || history.length <= 1) { 
+                const promptDiv = document.createElement('div');
+                promptDiv.className = 'welcome-prompt';
+                promptDiv.innerHTML = `<h1>Starlighter</h1><p>Using ${CURRENT_MODEL.name}. Ask a question to start a new conversation.</p>`;
+                chatBox.appendChild(promptDiv);
+            } else {
+                history.slice(1).forEach(msg => { 
+                    addMessage(msg.role, msg.content, chatBox);
+                });
+            }
+            toggleModelSelectorLock();
+            userInput.focus();
+        }
+
+        // 💡 MODIFIED: Accepts initialTitle and stores history as an object
+        function createNewChatObject(id, initialTitle) {
+            const newHistory = [getModelSystemPrompt(CURRENT_MODEL.name)];
+            
+            allChatHistories[id] = {
+                history: newHistory,
+                title: initialTitle
+            };
+            
+            saveStateToLocalStorage();
+            return newHistory;
+        }
+
+        // 💡 MODIFIED: Updates title in the chat object and the sidebar element
+        function updateChatTitle(id, newTitle) {
+            const chatItem = document.querySelector(`.chat-item[data-chat-id="${id}"]`);
+            if (chatItem) {
+                const displayedTitle = newTitle.length > 50 ? newTitle.substring(0, 47).trim() + '...' : newTitle;
+                chatItem.textContent = displayedTitle;
+                
+                // Also update the stored title immediately
+                if (allChatHistories[id]) {
+                    allChatHistories[id].title = newTitle;
+                }
+                saveStateToLocalStorage();
+            }
+        }
+
+        function startNewChat() {
+            chatCounter++;
+            currentChatId = `chat-${chatCounter}`;
+            
+            createNewChatObject(currentChatId, `New Chat ${chatCounter}`);
+            
+            renderSidebar();
+            
+            document.querySelectorAll('.chat-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const newItem = document.querySelector(`.chat-item[data-chat-id="${currentChatId}"]`);
+            if (newItem) newItem.classList.add('active'); 
+
+            clearSelectedFile();
+
+            renderCurrentChat();
+        }
+        
+        function loadChat(chatId) {
+            if (currentChatId === chatId) return; 
+
+            currentChatId = chatId;
+            saveStateToLocalStorage();
+            
+            clearSelectedFile();
+
+            const chatObject = allChatHistories[chatId];
+            const history = chatObject ? chatObject.history : [];
+            
+            let modelKeyToLoad = Object.keys(MODELS)[0]; 
+
+            if (history && history.length > 0 && history[0].role === 'system') {
+                const promptContent = history[0].content;
+                
+                const match = promptContent.match(/currently running on the (.*?) model\./);
+                
+                if (match && match[1]) {
+                    const modelNameInHistory = match[1].trim();
+                    
+                    const modelKey = Object.keys(MODELS).find(key => MODELS[key].name === modelNameInHistory);
+
+                    if (modelKey) {
+                        modelKeyToLoad = modelKey;
+                    }
+                }
+            }
+            
+            selectModel(modelKeyToLoad); 
+
+            document.querySelectorAll('.chat-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`.chat-item[data-chat-id="${chatId}"]`).classList.add('active');
+        }
+
+        function renderSidebar() {
+            chatListContainer.innerHTML = ''; 
+            
+            const sortedChatIds = Object.keys(allChatHistories).sort((a, b) => {
+                return parseInt(b.split('-')[1]) - parseInt(a.split('-')[1]);
+            });
+
+            sortedChatIds.forEach(id => {
+                const chatObject = allChatHistories[id];
+                
+                // Get title from the stored object property
+                let title = chatObject.title || `Chat ${id.split('-')[1]}`; 
+
+                const chatItem = document.createElement('div');
+                chatItem.className = `chat-item ${id === currentChatId ? 'active' : ''}`;
+                chatItem.dataset.chatId = id;
+                chatItem.textContent = title.length > 50 ? title.substring(0, 47).trim() + '...' : title;
+                
+                chatItem.onclick = () => loadChat(id); 
+                
+                // Right-Click/Context Menu Listener
+                chatItem.addEventListener('contextmenu', function(event) {
+                    event.preventDefault(); 
+                    contextMenuTargetChatId = id; 
+                    contextMenu.style.top = `${event.clientY}px`;
+                    contextMenu.style.left = `${event.clientX}px`;
+                    contextMenu.style.display = 'block';
+                });
+
+                chatListContainer.appendChild(chatItem);
+            });
+        }
+        
+        // --- Context Menu Handlers (Updated for new chat structure) ---
+
+        async function handleDeleteChat() {
+            const chatIdToDelete = contextMenuTargetChatId;
+            
+            if (!chatIdToDelete) return; 
+            
+            const confirmed = await showCustomConfirm(
+                "Confirm Deletion", 
+                `Are you sure you want to delete chat ${allChatHistories[chatIdToDelete].title || chatIdToDelete}? This action cannot be undone.`
+            );
+            
+            if (!confirmed) {
+                return;
+            }
+
+            delete allChatHistories[chatIdToDelete];
+            
+            const remainingChatIds = Object.keys(allChatHistories);
+            
+            if (currentChatId === chatIdToDelete) {
+                if (remainingChatIds.length > 0) {
+                    // Load the first remaining chat
+                    currentChatId = remainingChatIds[0];
+                } else {
+                    // Create a new empty chat
+                    chatCounter++;
+                    currentChatId = `chat-${chatCounter}`;
+                    createNewChatObject(currentChatId, `New Chat ${chatCounter}`);
+                }
+            }
+
+            renderSidebar();
+            renderCurrentChat();
+            saveStateToLocalStorage();
+        }
+
+        async function handleEditChatTitle() {
+            const chatIdToEdit = contextMenuTargetChatId;
+            
+            const chatObject = allChatHistories[chatIdToEdit];
+            const chatItem = document.querySelector(`.chat-item[data-chat-id="${chatIdToEdit}"]`);
+            if (!chatIdToEdit || !chatItem || !chatObject) return;
+
+            const currentTitle = chatObject.title || chatItem.textContent.replace('...', '').trim();
+            
+            const newTitle = await showCustomPrompt(
+                "Edit Chat Title", 
+                `Enter a new title for this chat:`, 
+                currentTitle
+            );
+
+            if (newTitle && newTitle.trim()) {
+                const cleanNewTitle = newTitle.trim();
+                
+                // Update title property
+                chatObject.title = cleanNewTitle;
+                
+                // Check if history exists to potentially update first user message content (optional, but good practice)
+                const history = chatObject.history;
+                const firstUserMsgIndex = history.findIndex(msg => msg.role === 'user');
+                
+                if (firstUserMsgIndex !== -1) {
+                    history[firstUserMsgIndex].content = cleanNewTitle;
+                } else if (history.length === 1) { 
+                    // If no user message yet, push a dummy user message to establish content
+                    history.push({ "role": "user", "content": cleanNewTitle });
+                }
+
+                updateChatTitle(chatIdToEdit, cleanNewTitle);
+                renderSidebar(); 
+            }
+        }
+        
+        // --- File Handling Functions (Unchanged from last version) ---
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Basic file size check (4MB limit for Groq Base64)
+                if (file.size > 4 * 1024 * 1024) {
+                    alert("File size exceeds 4MB. Please select a smaller image.");
+                    event.target.value = ''; // Clear the input
+                    return;
+                }
+                selectedFile = file;
+                selectedFileName.textContent = selectedFile.name;
+                fileDisplayArea.style.display = 'flex';
+                imageFileInput.value = ''; 
+            }
+        }
+
+        function clearSelectedFile() {
+            selectedFile = null;
+            imageFileInput.value = ''; 
+            fileDisplayArea.style.display = 'none';
+            selectedFileName.textContent = 'No file selected';
+        }
+
+        function encodeFileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    resolve(reader.result);
+                };
+                reader.onerror = (error) => {
+                    reject(error);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+
+        // --- Utility Functions (Unchanged) ---
+        function scrollToBottom() {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function addMessage(role, content, targetElement = chatBox) {
+            const msgDiv = document.createElement('div');
+            
+            const safeRole = (role === 'user' || role === 'ai') ? role : 'ai';
+            
+            msgDiv.className = `message ${safeRole}-message`;
+            
+            const contentToParse = content && typeof content === 'string' ? content : '...';
+            let renderedHtml;
+            
+            if (typeof marked !== 'undefined' && typeof marked.parse === 'function') {
+                const decodedContent = new DOMParser().parseFromString(contentToParse, 'text/html').documentElement.textContent;
+                renderedHtml = marked.parse(decodedContent);
+            } else {
+                renderedHtml = contentToParse.replace(/\n/g, '<br>');
+            }
+            msgDiv.innerHTML = renderedHtml;
+            targetElement.appendChild(msgDiv);
+            scrollToBottom();
+            
+            return msgDiv;
+        }
+
+        // --- API Key Loading (Unchanged) ---
+        async function loadApiKey() {
+            const hasExistingChats = loadStateFromLocalStorage();
+            populateModelSelector(); 
+
+            selectModel(Object.keys(MODELS).find(key => MODELS[key].id === CURRENT_MODEL.id) || Object.keys(MODELS)[0]);
+
+            if (Object.keys(allChatHistories).length === 0) {
+                createNewChatObject('chat-0', 'Initial Chat');
+                currentChatId = 'chat-0';
+            }
+
+            renderSidebar();
+            
+            showStartPage();
+            apiStatus.textContent = 'Fetching API Key...';
+            try {
+                const response = await fetch(API_KEY_URL);
+                if (!response.ok) throw new Error(`HTTP Status: ${response.status}`);
+                GROQ_API_KEY = (await response.text()).trim();
+                
+                if (GROQ_API_KEY.length < 10) throw new Error("Key is too short or invalid.");
+
+                apiStatus.textContent = 'API Key loaded successfully.';
+                
+                modelSelectDropdown.disabled = false;
+                sendButton.disabled = false;
+                userInput.disabled = false;
+                
+                document.querySelectorAll('.model-button').forEach(btn => btn.style.pointerEvents = 'auto');
+
+                if (hasExistingChats) {
+                    showChatInterface();
+                } else {
+                    const initialModelKey = Object.keys(MODELS).find(key => MODELS[key].id === CURRENT_MODEL.id);
+                    if (initialModelKey) {
+                        const btn = document.querySelector(`.model-button[data-model-key="${initialModelKey}"]`);
+                        if(btn) btn.classList.add('selected');
+                    }
+                }
+            } catch (error) {
+                console.error('Groq API Key Loading Error:', error);
+                apiStatus.innerHTML = `<span style="color:red;">Error: Could not load API Key. (${error.message})</span>`;
+            }
+            toggleModelSelectorLock();
+        }
+        
+        // --- Send Message Function (Updated for Multimodal support & title naming) ---
+        async function sendMessage() {
+            
+            const userText = userInput.value.trim();
+            if (!userText && !selectedFile) return; 
+            if (!GROQ_API_KEY) return;
+            
+            const currentChatObject = allChatHistories[currentChatId];
+            const currentHistory = currentChatObject.history; 
+
+            // Check if it's the first non-system message
+            const isFirstMessage = currentHistory.length === 1; 
+
+            userInput.value = '';
+            sendButton.disabled = true;
+            userInput.disabled = true;
+            modelSelectDropdown.disabled = true;
+            fileUploadButton.disabled = true;
+
+            let finalUserMessageContent;
+            let fileToDisplay = selectedFile; // Keep a reference for display before clearing selectedFile
+
+            // 💡 Constructing the Multimodal Content Array
+            if (fileToDisplay) {
+                if (!CURRENT_MODEL.multimodal) {
+                    alert("Cannot send image. Please select a Multimodal model (like Llama 4 Scout).");
+                    clearSelectedFile(); 
+                    sendButton.disabled = false;
+                    userInput.disabled = false;
+                    fileUploadButton.disabled = false;
+                    return;
+                }
+                
+                try {
+                    const base64Url = await encodeFileToBase64(fileToDisplay);
+                    
+                    finalUserMessageContent = [];
+                    // 1. Add the text part of the prompt
+                    if (userText) {
+                        finalUserMessageContent.push({ "type": "text", "text": userText });
+                    }
+                    // 2. Add the image part (Base64 URL)
+                    finalUserMessageContent.push({ 
+                        "type": "image_url", 
+                        "image_url": { "url": base64Url } 
+                    });
+
+                } catch (e) {
+                    addMessage('ai', `Error reading file: ${e.message}`, chatBox);
+                    sendButton.disabled = false;
+                    userInput.disabled = false;
+                    fileUploadButton.disabled = false;
+                    clearSelectedFile();
+                    return;
+                }
+            } else {
+                // Standard text-only message
+                finalUserMessageContent = userText; 
+            }
+
+            // 1. Add User Message (Appended directly to the chatBox)
+            const displayContent = fileToDisplay ? `${userText} [Image: ${fileToDisplay.name}]` : userText;
+            addMessage('user', displayContent);
+            
+            currentHistory.push({ "role": "user", "content": finalUserMessageContent });
+            
+            // Clear the file state AFTER we've built the message and added it to history
+            clearSelectedFile();
+
+            // ==========================================================
+            // 💡 NEW/MODIFIED TITLE LOGIC HERE
+            // ==========================================================
+            if (isFirstMessage) {
+                let newTitle;
+                if (fileToDisplay) {
+                    // If it's the first message AND includes an image:
+                    imageAnalysisCounter++;
+                    newTitle = `Image Analysis ${imageAnalysisCounter}`;
+                } else {
+                    // If it's the first message and is only text:
+                    newTitle = userText; 
+                }
+                
+                updateChatTitle(currentChatId, newTitle); 
+                renderSidebar(); 
+            }
+            // ==========================================================
+
+
+            // 2. Add AI Placeholder Message
+            const aiMessageElement = addMessage('ai', 'Thinking...'); 
+
+            try {
+                const response = await fetch(GROQ_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${GROQ_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: CURRENT_MODEL.id, 
+                        messages: currentHistory, 
+                        temperature: 0.7,
+                        max_tokens: 500
+                    })
+                });
+
+                if (!response.ok) {
+                    let errorText = `HTTP Error: ${response.status} ${response.statusText}`;
+                    try {
+                        const errorData = await response.json();
+                        if (errorData.error && errorData.error.message) errorText = errorData.error.message;
+                    } catch (e) {}
+
+                    const match = errorText.match(/Please try again in (\d+\.?\d*)s/);
+                    if (match) throw new Error(`Rate Limit Exceeded. Try again in ${match[1]} seconds.`);
+                    else throw new Error(errorText);
+                }
+
+                const data = await response.json();
+                
+                const assistantResponse = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content
+                    ? data.choices[0].message.content
+                    : "Sorry, I received an empty response from the API.";
+                const renderedHtml = (typeof marked !== 'undefined' && typeof marked.parse === 'function')
+                    ? marked.parse(assistantResponse) 
+                    : assistantResponse.replace(/\n/g, '<br>'); 
+                
+                // 3. Update AI Placeholder with final response
+                aiMessageElement.innerHTML = renderedHtml;
+                currentHistory.push({ "role": "assistant", "content": assistantResponse });
+                
+                scrollToBottom();
+                saveStateToLocalStorage();
+
+            } catch (error) {
+                console.error('Groq API Call Failed:', error);
+                aiMessageElement.innerHTML = `<span style="color:red;">${error.message}</span>`;
+            } finally {
+                toggleModelSelectorLock();
+                sendButton.disabled = false;
+                userInput.disabled = false;
+                fileUploadButton.disabled = false;
+                userInput.focus();
+            }
+        }
+
+        // --- Setup Event Listeners (Updated for new file elements) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            newChatButton.addEventListener('click', startNewChat);
+
+            // Context menu handlers
+            contextMenu.addEventListener('click', (event) => {
+                event.stopPropagation(); 
+                const button = event.target.closest('button');
+                if (!button) return; 
+                
+                const action = button.dataset.action;
+                
+                if (action === 'edit') {
+                    handleEditChatTitle();
+                } else if (action === 'delete') {
+                    handleDeleteChat();
+                }
+                
+                hideContextMenu();
+            });
+
+            document.addEventListener('click', hideContextMenu);
+            document.addEventListener('contextmenu', (e) => {
+                if (!e.target.closest('.chat-item')) {
+                     hideContextMenu();
+                }
+            });
+            
+            // 💡 File Input Listeners
+            fileUploadButton.addEventListener('click', () => {
+                imageFileInput.click();
+            });
+
+            imageFileInput.addEventListener('change', handleFileSelect);
+            
+            clearFileButton.addEventListener('click', clearSelectedFile);
+            
+            // Send message listener
+            userInput.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    if (!event.shiftKey && !sendButton.disabled) {
+                        event.preventDefault(); 
+                        sendMessage();
+                    } 
+                }
+            });
+
+            sendButton.addEventListener('click', sendMessage);
+
+            loadApiKey();
+        });
+    </script>
 </body>
 </html>
