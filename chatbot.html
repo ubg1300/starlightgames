@@ -1044,39 +1044,56 @@ function loadChat(chatId) {
         
         // --- Context Menu Handlers (Unchanged) ---
 
-        async function handleDeleteChat() {
-            const chatIdToDelete = contextMenuTargetChatId;
-            
-            if (!chatIdToDelete) return; 
-            
-            const confirmed = await showCustomConfirm(
-                "Confirm Deletion", 
-                `Are you sure you want to delete chat ${allChatHistories[chatIdToDelete].title || chatIdToDelete}? This action cannot be undone.`
-            );
-            
-            if (!confirmed) {
-                return;
-            }
+async function handleDeleteChat() {
+    const chatIdToDelete = contextMenuTargetChatId;
+    
+    if (!chatIdToDelete) return; 
+    
+    const confirmed = await showCustomConfirm(
+        "Confirm Deletion", 
+        `Are you sure you want to delete chat ${allChatHistories[chatIdToDelete].title || chatIdToDelete}? This action cannot be undone.`
+    );
+    
+    if (!confirmed) {
+        return;
+    }
 
-            delete allChatHistories[chatIdToDelete];
-            
-            const remainingChatIds = Object.keys(allChatHistories);
-            
-            if (currentChatId === chatIdToDelete) {
-                if (remainingChatIds.length > 0) {
-                    currentChatId = remainingChatIds[0];
-                } else {
-                    // Create a new empty chat
-                    chatCounter++;
-                    currentChatId = `chat-${chatCounter}`;
-                    createNewChatObject(currentChatId, `New Chat ${chatCounter}`);
-                }
-            }
+    delete allChatHistories[chatIdToDelete];
+    
+    const remainingChatIds = Object.keys(allChatHistories);
+    
+    let newChatToLoadId = null; 
 
-            renderSidebar();
-            renderCurrentChat();
-            saveStateToLocalStorage();
+    if (currentChatId === chatIdToDelete) {
+        if (remainingChatIds.length > 0) {
+            // Find the most recent chat ID to load (assuming they are sorted)
+            // Sorting by ID ensures we pick the highest number, which is the most recent
+            const sortedIds = remainingChatIds.sort((a, b) => {
+                return parseInt(b.split('-')[1]) - parseInt(a.split('-')[1]);
+            });
+            newChatToLoadId = sortedIds[0];
+        } else {
+            // Create a new empty chat if no other chats exist
+            chatCounter++;
+            newChatToLoadId = `chat-${chatCounter}`;
+            createNewChatObject(newChatToLoadId, `New Chat ${chatCounter}`);
         }
+    }
+    
+    renderSidebar();
+    saveStateToLocalStorage();
+    
+    // --- CRUCIAL FIX HERE ---
+    // Instead of relying on renderCurrentChat() (which might miss the model sync),
+    // we explicitly call loadChat() for the new chat, forcing the full model sync.
+    if (newChatToLoadId) {
+        loadChat(newChatToLoadId); 
+    } else {
+        // If the deleted chat was not the current chat, just re-render to update the sidebar.
+        renderCurrentChat(); 
+    }
+    // ------------------------
+}
 
         async function handleEditChatTitle() {
             const chatIdToEdit = contextMenuTargetChatId;
