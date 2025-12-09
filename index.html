@@ -1891,7 +1891,8 @@ async function runUrlCloak() { // MUST be async now
           // --- NEW ---
           // Show the disclaimer *after* the loading screen is hidden
           // We wait a tiny bit for the loading screen to fade out
-          setTimeout(()=>{                      showModal("Redirect on: redirects to google when tab unfocused/switched. \nRedirect off: covers screen white until you click screen then click 'E' (If you click 'SpaceBar' on the webpage, the webpage redirects to google)");
+          setTimeout(()=>{               applyCustomCloak('Google', 'https://www.google.com/favicon.ico');
+               showModal("Redirect on: redirects to google when tab unfocused/switched. \nRedirect off: covers screen white until you click screen then click 'E' (If you click 'SpaceBar' on the webpage, the webpage redirects to google)");
           
 }, 500);
       }
@@ -1900,7 +1901,6 @@ async function runUrlCloak() { // MUST be async now
       window.addEventListener('load', () => {
           // Hide the loading screen after a small delay
           setTimeout(hideLoadingScreen, 500);
-          applyCustomCloak('Google','https://google.com/favicon.ico');
       });
 
         // Get references to the modal elements
