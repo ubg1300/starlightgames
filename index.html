@@ -1361,7 +1361,6 @@ const chatbotIframe = document.getElementById('chatbot-iframe');
     // **4. Execute something specific if the selected tab is 'chatbot'**
     
     if (tabId === 'chatbots') {
-      showModal("LOADING");
       if(footersetter == false){
       footersetter = true;
 
@@ -1373,6 +1372,8 @@ chatbotIframe.src = "https://starlightgg.github.io/chatbot";
 if(notfirstmessage){
   notfirstmessage = false;
   showModal('If you are using AI and it isnt getting recent resources, use either chatgpt or compound for web search, ask it to search web for [keyword]. Also, Llama 4 scout can view images. ');
+        showModal("Please always wait patiently when loading chatbot");
+
 }
 }else{
 if (footersetter == true) {
