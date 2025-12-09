@@ -974,7 +974,7 @@
                     <div class="menu-section-title">🔗 Main link</div>
           <div class="menu-buttons">
               <button
-              onclick="showIframe('https://starlightgg.github.io/gamesearch.html'); showModal('If there are any games that are broken, please contact owner so he can fix it');"
+              onclick="GGgames()"
             >
               🕹️ Load StarlightGG Hub (Recommended)
             </button>
@@ -1255,7 +1255,14 @@ async function loadQuotes() {
         }
     }
 }
-
+let disclamers = true;
+function GGgames() {
+  showIframe('https://starlightgg.github.io/gamesearch.html'); 
+  if (disclamers){
+  showModal('If there are any games that are broken, please contact owner so he can fix it');
+  disclamers=false;
+  }
+}
 
 function updateQuote() {
     // Only proceed if quotes have been loaded and the display element exists
@@ -1363,8 +1370,11 @@ const chatbotIframe = document.getElementById('chatbot-iframe');
     if (tabId === 'chatbots') {
       if(footersetter == false){
       footersetter = true;
-
+                if (footerToggleButton && footerToggleButton.getAttribute('data-footer-enabled') === 'false') {
                    toggleFooter();
+                }
+                                   toggleFooter();
+
       }
         // --- ADD YOUR CHATBOT-SPECIFIC CODE HERE ---
 chatbotIframe.src = "https://starlightgg.github.io/chatbot";
@@ -1377,10 +1387,12 @@ if(notfirstmessage){
 }
 }else{
 if (footersetter == true) {
+  
   toggleFooter();
+  
   footersetter = false;
 
-    }
+}
       chatbotIframe.src = "";
 
     }
@@ -2251,4 +2263,4 @@ document.addEventListener('DOMContentLoaded', () => {
 }); // End of DOMContentLoaded
 </script>
   </body>
-</html>
+</html> 
