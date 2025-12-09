@@ -1795,7 +1795,7 @@ async function applyUrlCloak(targetUrl) {
 function extractTitle(html) {
     // Robust regex to find the title tag content
     const match = html.match(/<title\b[^>]*>([^<]*?)<\/title>/i);
-    return match ? match[1].trim() : 'Title Not Found (Proxy Error)';
+    return match ? match[1].trim() : 'Google';
 }
 /** Helper to Fetch Title using CodeTabs Proxy (No longer uses external span) */
 async function fetchTitleWithProxy(urlInput) {
@@ -1818,7 +1818,7 @@ async function fetchTitleWithProxy(urlInput) {
         
         const errorMsg = error.message.includes('Failed to fetch')
                              ? 'Network/Firewall Blocked Proxy. Set Title Manually.'
-                             : `Error: Could not retrieve title.`;
+                             : `Google`;
         
         return errorMsg; 
     }
