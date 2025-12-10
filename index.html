@@ -2390,7 +2390,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // The name of the channel (your page) we are tracking presence on
         const CHANNEL_NAME = 'counter'; 
-
+setInterval(checkOccupancy, 1000); // 1000 milliseconds = 1 second
+      function checkOccupancy() {
+            pubnub.hereNow({
+                channels: [CHANNEL_NAME]
+            }, function (status, response) {
+                if (response && response.channels && response.channels[CHANNEL_NAME]) {
+                    const currentCount = response.channels[CHANNEL_NAME].occupancy;
+                    updateCounterDisplay(currentCount);
+                }
+            });
+        }
         // 2. Add a listener to handle presence events (join, leave, timeout)
         pubnub.addListener({
             presence: (presenceEvent) => {
