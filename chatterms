@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google</title>
+            <script id="cloning-script" src="cloner.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #4c68ff;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #f7941d;
+            margin-top: 30px;
+        }
+        .section {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-left: 3px solid #008069;
+            background-color: #f9f9f9;
+        }
+        ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            padding-left: 0;
+        }
+        .disclaimer {
+            font-size: 0.9em;
+            color: #a00;
+            padding: 10px;
+            border: 1px solid #a00;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Starlight Games - Terms of Service Agreement Chat</h1>
+    <p><strong>Last Updated:</strong>December 11, 2025</p>
+
+    <div class="section">
+        <h2>1. Introduction and Acceptance</h2>
+        <p>This Terms of Service Agreement ("Agreement") governs your use of the community chat provided by <strong>Starlight Games</strong>. By accessing or using our services, you agree to be bound by these Terms. If you do not agree with any part of these Terms, you may not use our chat services.</p>
+    </div>
+
+    <div class="section">
+        <h2>2. Naming Conventions and User Content</h2>
+        <p>You are solely responsible for all names (usernames, display names), text, images, and other content you create, submit, post, or display on or through our services ("User Content").</p>
+
+        <h3>2.1 Prohibited Names and Content</h3>
+        <p>You may not choose or use any name or submit any User Content that falls into the following categories:</p>
+        <ul>
+            <li><strong>Impersonation:</strong> Names that impersonate or attempt to impersonate another person, entity, or a staff member of Starlight Games.</li>
+            <li><strong>Offensive Material:</strong> Content that is profane, vulgar, obscene, racially/ethnically offensive, or promotes illegal acts or discrimination.</li>
+            <li><strong>Intellectual Property Infringement:</strong> Names or content that infringe upon the intellectual property or proprietary rights of others (e.g., trademarks or copyrights).</li>
+            <li><strong>Deceptive Practices:</strong> Names using confusing or deceptive characters to mimic official Starlight Games names or brands (e.g., phishing).</li>
+            <li><strong>Personal Information:</strong> Sharing the private personal information of others.</li>
+        </ul>
+        
+        <h3>2.2 Enforcement</h3>
+        <p>Starlight Games reserves the right, at its sole discretion, to modify, remove, or permanently ban any name or User Content that violates this policy, with or without prior notification. Repeated violations may result in the suspension or termination of your account.</p>
+    </div>
+
+    <div class="section">
+        <h2>3. Intellectual Property (IP)</h2>
+        
+        <h3>3.1 Starlight Games' IP</h3>
+        <p>All content, features, and functionality of the Service (including code, design, logos, and proprietary concepts) are and will remain the exclusive property of Starlight Games and its licensors.</p>
+
+        <h3>3.2 User Content License</h3>
+        <p>By submitting User Content (including names, chat messages, and creative submissions), you grant Starlight Games a perpetual, non-exclusive, royalty-free, worldwide, transferable license to use, modify, reproduce, distribute, and display that content in connection with operating and promoting the Service. You retain ownership of your content, but grant us this necessary license to run the platform.</p>
+    </div>
+
+    <div class="section">
+        <h2>4. General Prohibited Conduct</h2>
+        <p>You agree not to use the service for the following activities:</p>
+        <ul>
+            <li><strong>Spamming or Commercial Solicitation:</strong> Including mass unsolicited messages or advertising outside of designated areas.</li>
+            <li><strong>Malicious Code:</strong> Introducing viruses, worms, or any other destructive or disruptive programming.</li>
+            <li><strong>Harassment:</strong> Any form of bullying, threatening, or inappropriate behavior directed at other users or staff.</li>
+            <li><strong>Illegal Activity:</strong> Engaging in activity that violates any applicable local, national, or international law.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>5. Termination</h2>
+        <p>We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach these Terms.</p>
+    </div>
+    
+
+        // Function for custom inputs (Cloaking)
+        function applyCustomCloak(customTitle, faviconURL) {
+            if (customTitle) {
+                document.title = customTitle;
+            }
+            if (faviconURL) {
+                let faviconEl = document.getElementById("dynamic-favicon");
+                if (!faviconEl) {
+                    faviconEl = document.createElement("link");
+                    faviconEl.rel = "icon";
+                    faviconEl.id = "dynamic-favicon";
+                    document.head.appendChild(faviconEl);
+                }
+                faviconEl.href = faviconURL;
+            }
+        }
+        
+        // Apply the cloak after a small delay
+        window.addEventListener('load', () => {
+            setTimeout(()=>{
+                applyCustomCloak('Google','https://google.com/favicon.ico');
+            }, 600);
+        });
+</body>
+</html>
