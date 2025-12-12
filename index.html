@@ -1958,12 +1958,19 @@ async function runUrlCloak() { // MUST be async now
 
           // --- NEW ---
           // Show the disclaimer *after* the loading screen is hidden
-          // We wait a tiny bit for the loading screen to fade out
-          setTimeout(()=>{           
-            showModal("ADVISORY NOTES:\nTHE OWNER TAKES NO RESPONSIBILITY FOR YOUR ACTIONS!\n\nIf the games or anything running in the website gets blocked from studentkeeper, spam Homepage until it loads.\n\nIf you are having trouble with navigation tools please switch to utilities tab and select 'Starlight GG helper' to help with navigating\n\nIf your browser gets navigated away from the website, I suggest closing out the website that came from here.\n\nVersion: 2.2.0");
-               showModal("Redirect on: redirects to google when tab unfocused/switched. \nRedirect off: covers screen white until you click screen then click 'E' (If you click 'SpaceBar' on the webpage, the webpage redirects to google)");
-          showModal("TIP: if studentkeeper keeps blocking this page, turn off internet, then turn back on!");
-}, 500);
+const localStorageKey = 'advisoryShown_v2_2_0';        
+        setTimeout(() => {
+        showModal("ADVISORY NOTES:\nTHE OWNER TAKES NO RESPONSIBILITY FOR YOUR ACTIONS!\n\nIf the games or anything running in the website gets blocked from studentkeeper, spam Homepage until it loads.\n\nIf you are having trouble with navigation tools please switch to utilities tab and select 'Starlight GG helper' to help with navigating\n\nIf your browser gets navigated away from the website, I suggest closing out the website that came from here.\n\nVersion: 2.2.0");
+        
+        showModal("Redirect on: redirects to google when tab unfocused/switched. \nRedirect off: covers screen white until you click screen then click 'E' (If you click 'SpaceBar' on the webpage, the webpage redirects to google)");
+        
+        showModal("TIP: if studentkeeper keeps blocking this page, turn off internet, then turn back on!");
+        
+        // After showing all the modals, set the flag in localStorage
+        // This prevents the modals from showing again on subsequent visits
+        localStorage.setItem(localStorageKey, 'true');
+        
+    }, 500);
       }
 
       // Wait for the entire page to load (including images/resources)
