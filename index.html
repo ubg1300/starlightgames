@@ -2085,9 +2085,15 @@ setTimeout(()=>{applyCustomCloak('Google','https://google.com/favicon.ico');}, 6
          * It must be async, and must use 'await' before showModal.
          */
         async function openPlaylist() {
+                            const localStorageKey5 = 'playlistadvisoryShown_v2_2_0';        
+if (localStorage.getItem(localStorageKey5) === null) {
+
             // 1. The script PAUSES here until the user dismisses the modal.
             await showModal("If you judge my music or play it out loud to the class, I will punch you, slice you, grate you, burn you, put you in the oven, feed you to dogs, hang you, cut you, choke you, kick you, whip you, and dump you out.");
-            
+
+        localStorage.setItem(localStorageKey5, 'true');
+
+}
             // 2. This line only runs AFTER the user closes the modal.
             showIframe('https://starlightgg.github.io/playlist');
         }
