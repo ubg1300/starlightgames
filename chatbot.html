@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google</title>
-<style>/* --- Neumorphic Base Color and Variables --- */
+    <style>/* --- Neumorphic Base Color and Variables --- */
 :root {
     --neumorphic-bg: #e0e5ec;
     --main-color: #007bff; /* Primary Blue */
@@ -236,7 +236,9 @@ body, html {
 
 }
 
-.user-message { 
+.user-message {
+    position: relative; /* THIS IS VITAL: Makes the message bubble the positioning context */
+
     background-color: var(--main-color); 
     color: white; 
     margin-left: auto; 
@@ -246,6 +248,7 @@ body, html {
 max-width: 100vh;
 }
 .ai-message { 
+  position: relative; /* THIS IS VITAL: Makes the message bubble the positioning context */
     background-color: #f0f5fa; /* Lighter shade of background for AI */
     color: #333; 
     max-width: 100vh;
@@ -256,7 +259,50 @@ max-width: 100vh;
     overflow-x: auto;
 
 }
+/* --- 3. Copy Button Specific Neumorphism Styles --- */
+.copy-button {
+  
+    position: absolute;
+    top: 6px; 
+    right: 6px; 
+    border: none;
+    padding: 4px 8px;
+    border-radius: 6px; /* Soft rounded corners */
+    cursor: pointer;
+    font-size: 0.7em;
+    font-weight: 600;
+    opacity: 0.7; 
+    z-index: 10;
+    transition: all 0.2s ease-in-out;
+    
+    /* Neumorphism: Extruded (Outward) Look */
+    background: var(--neumo-bg);
+    color: #555; /* Neutral text color */
+    box-shadow: 2px 2px 4px 0 var(--neumo-dark),
+               -2px -2px 4px 0 var(--neumo-light);
+}
+.ai-message:hover .copy-button {
+    opacity: 1; 
+}
 
+/* Slightly enhance the shadow on button hover */
+.copy-button:hover {
+    color: var(--primary-color);
+    box-shadow: 3px 3px 6px 0 var(--neumo-dark),
+               -3px -3px 6px 0 var(--neumo-light);
+}
+
+/* Neumorphism: Pressed (Inward) Look when clicked or successfully copied */
+.copy-button:active,
+.copy-button.copied {
+    /* Reverse the shadows to create the recessed effect */
+    box-shadow: inset 2px 2px 4px var(--neumo-dark),
+                inset -2px -2px 4px var(--neumo-light);
+    color: #28a745; /* Green color for copied state */
+    background: var(--neumo-bg);
+    transform: scale(0.95); /* A slight shrink adds to the 'pressed' feel */
+    font-weight: bold;
+}
 /* --- Input Area --- */
 .input-area { 
     display: flex; 
@@ -1260,57 +1306,178 @@ async function handleDeleteChat() {
         function scrollToBottom() {
             if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
         }
+/**
+ * Copies text to the clipboard and provides visual feedback on the button.
+ * @param {string} text The text content to be copied.
+ * @param {HTMLElement} buttonElement The button element clicked (used for feedback).
+ */
+function copyToClipboard(text, buttonElement) {
+    if (!text || text.trim() === '') {
+        console.warn("Attempted to copy empty text.");
+        return; 
+    }
 
-        function addMessage(role, content, targetElement = chatBox) {
-            const msgDiv = document.createElement('div');
+    const originalText = buttonElement.textContent;
+
+    // Function to handle the visual feedback
+    const showFeedback = () => {
+        buttonElement.textContent = 'Copied!';
+        buttonElement.classList.add('copied');
+        
+        setTimeout(() => {
+            buttonElement.textContent = originalText;
+            buttonElement.classList.remove('copied');
+        }, 1500);
+    };
+
+    // --- Modern Clipboard API ---
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(showFeedback).catch(err => {
+            console.error('Modern clipboard failed:', err);
+            // Fall through to the older method if the modern API fails
+            fallbackCopyTextToClipboard(text, buttonElement);
+        });
+    } else {
+        // --- Fallback Method ---
+        fallbackCopyTextToClipboard(text, buttonElement);
+    }
+}
+
+
+/**
+ * Fallback mechanism for copying text using the deprecated document.execCommand('copy').
+ * This is less secure but highly compatible.
+ * @param {string} text The text content to be copied.
+ * @param {HTMLElement} buttonElement The button element clicked (used for feedback).
+ */
+function fallbackCopyTextToClipboard(text, buttonElement) {
+    let textArea = document.createElement("textarea");
+    
+    // Position off screen
+    textArea.style.position = 'fixed';
+    textArea.style.top = '0';
+    textArea.style.left = '0';
+    textArea.style.width = '2em';
+    textArea.style.height = '2em';
+    textArea.style.padding = '0';
+    textArea.style.border = 'none';
+    textArea.style.outline = 'none';
+    textArea.style.boxShadow = 'none';
+    textArea.style.background = 'transparent';
+    
+    textArea.value = text;
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            // Success feedback
+            const originalText = buttonElement.textContent;
+            buttonElement.textContent = 'Copied!';
+            buttonElement.classList.add('copied');
             
-            const safeRole = (role === 'user' || role === 'ai') ? role : 'ai';
-            
-            msgDiv.className = `message ${safeRole}-message`;
-            
-            let contentToParse;
-
-            // Check if the content is the complex multimodal array structure
-            if (Array.isArray(content)) {
-                let displayParts = [];
-                let hasImage = false;
-
-                content.forEach(part => {
-                    if (part.type === 'text' && part.text && part.text.trim()) {
-                        displayParts.push(part.text.trim());
-                    } else if (part.type === 'image_url') {
-                        hasImage = true;
-                    }
-                });
-
-                // Construct a clean string for display
-                if (hasImage) {
-                    displayParts.push('**[Image Attached]**');
-                }
-                
-                contentToParse = displayParts.join('<br>');
-
-            } else {
-                // Standard text-only message (or system/AI message)
-                contentToParse = content && typeof content === 'string' ? content : '...';
-            }
-
-
-            let renderedHtml;
-            
-            if (typeof marked !== 'undefined' && typeof marked.parse === 'function') {
-                const decodedContent = new DOMParser().parseFromString(contentToParse, 'text/html').documentElement.textContent;
-                renderedHtml = marked.parse(decodedContent);
-            } else {
-                renderedHtml = contentToParse.replace(/\n/g, '<br>');
-            }
-
-            msgDiv.innerHTML = renderedHtml;
-            targetElement.appendChild(msgDiv);
-            scrollToBottom();
-            
-            return msgDiv;
+            setTimeout(() => {
+                buttonElement.textContent = originalText;
+                buttonElement.classList.remove('copied');
+            }, 1500);
+        } else {
+            console.error('Fallback copy failed.');
+            alert('Could not copy text (fallback failed). Please try manually.');
         }
+    } catch (err) {
+        console.error('Fallback copy error:', err);
+        alert('Could not copy text (error). Please try manually.');
+    }
+
+    document.body.removeChild(textArea);
+}
+
+
+// --- 2. The Core addMessage Function (FIXED for Copy Reliability) ---
+function addMessage(role, content, targetElement = chatBox) {
+    const msgDiv = document.createElement('div');
+    const safeRole = (role === 'user' || role === 'ai') ? role : 'ai';
+    msgDiv.className = `message ${safeRole}-message`;
+    
+    let contentToParse;
+
+    // Handle Multimodal Content Structure (Array)
+    if (Array.isArray(content)) {
+        let displayParts = [];
+        let hasImage = false;
+        content.forEach(part => {
+            if (part.type === 'text' && part.text && part.text.trim()) {
+                displayParts.push(part.text.trim());
+            } else if (part.type === 'image_url') {
+                hasImage = true;
+            }
+        });
+        if (hasImage) {
+            displayParts.push('**[Image Attached]**');
+        }
+        contentToParse = displayParts.join('\n'); // Use \n for Markdown
+    } else {
+        // Standard text-only message (String)
+        contentToParse = content && typeof content === 'string' ? content : '...';
+    }
+
+    
+    // CRITICAL: 1. Capture the original, un-rendered text for copying
+    // This text is stored on the button and used for the copy action.
+    const rawTextForCopy = Array.isArray(content) 
+        ? content.filter(p => p.type === 'text').map(p => p.text).join('\n') 
+        : contentToParse;
+
+
+    // 2. Render HTML from Content
+    let renderedHtml;
+    if (typeof marked !== 'undefined' && typeof marked.parse === 'function') {
+        const decodedContent = new DOMParser().parseFromString(contentToParse, 'text/html').documentElement.textContent;
+        renderedHtml = marked.parse(decodedContent);
+    } else {
+        renderedHtml = contentToParse.replace(/\n/g, '<br>');
+    }
+    
+    
+    // 3. Create the inner container for text (Preserves button integrity)
+    const contentContainer = document.createElement('div');
+    contentContainer.className = 'message-content';
+    contentContainer.innerHTML = renderedHtml;
+
+    msgDiv.appendChild(contentContainer); 
+
+
+    // 4. Add Copy Button only to AI Messages
+    if (safeRole === 'ai') {
+        const copyButton = document.createElement('button');
+        copyButton.className = 'copy-button';
+        copyButton.textContent = 'Copy';
+        
+        // CRITICAL FIX: Store the copy text in a data attribute
+        copyButton.setAttribute('data-text', rawTextForCopy);
+        
+        // The click handler reads the text from the data attribute
+        copyButton.onclick = function() {
+            const textToCopy = this.getAttribute('data-text');
+            copyToClipboard(textToCopy, this);
+        };
+        
+        msgDiv.appendChild(copyButton);
+        msgDiv.classList.add('with-action');
+    }
+
+    targetElement.appendChild(msgDiv);
+    // Assume this utility function is defined globally
+    if (typeof scrollToBottom === 'function') {
+        scrollToBottom();
+    }
+    
+    // CRITICAL: Return the main message div (REQUIRED by sendMessage to update the content)
+    return msgDiv; 
+}
 
         // --- API Key Loading ---
         async function loadApiKey() {
@@ -1363,151 +1530,173 @@ async function handleDeleteChat() {
             renderCurrentChat();
         }
         
-        // --- Send Message Function (The core execution loop) ---
-        async function sendMessage() {
-            
-            const userText = userInput.value.trim();
-            if (!userText && !selectedFile) return; 
-            if (!GROQ_API_KEY) return;
-            
-            const currentChatObject = allChatHistories[currentChatId];
-            const currentHistory = currentChatObject.history; 
+ // --- Send Message Function (The core execution loop) ---
+async function sendMessage() {
+           
+    const userText = userInput.value.trim();
+    if (!userText && !selectedFile) return; 
+    if (!GROQ_API_KEY) return;
+           
+    const currentChatObject = allChatHistories[currentChatId];
+    const currentHistory = currentChatObject.history; 
 
-            const isFirstMessage = currentHistory.length === 1; 
+    const isFirstMessage = currentHistory.length === 1; 
 
-            userInput.value = '';
-            sendButton.disabled = true;
-            userInput.disabled = true;
-            modelSelectDropdown.disabled = true;
-            fileUploadButton.disabled = true;
+    userInput.value = '';
+    sendButton.disabled = true;
+    userInput.disabled = true;
+    modelSelectDropdown.disabled = true;
+    fileUploadButton.disabled = true;
 
-            let finalUserMessageContent;
-            let fileToDisplay = selectedFile; 
+    let finalUserMessageContent;
+    let fileToDisplay = selectedFile; 
 
-            // 💡 Constructing the Multimodal Content Array
-            if (fileToDisplay) {
-                if (!CURRENT_MODEL.multimodal) {
-                    alert("Cannot send image. Please select a Multimodal model (like Llama 4 Scout).");
-                    clearSelectedFile(); 
-                    sendButton.disabled = false;
-                    userInput.disabled = false;
-                    fileUploadButton.disabled = false;
-                    return;
-                }
-                
-                try {
-                    const base64Url = await encodeFileToBase64(fileToDisplay);
-                    
-                    finalUserMessageContent = [];
-                    // 1. Add the text part of the prompt
-                    if (userText) {
-                        finalUserMessageContent.push({ "type": "text", "text": userText });
-                    }
-                    // 2. Add the image part (Base64 URL)
-                    finalUserMessageContent.push({ 
-                        "type": "image_url", 
-                        "image_url": { "url": base64Url } 
-                    });
-
-                } catch (e) {
-                    addMessage('ai', `Error reading file: ${e.message}`, chatBox);
-                    sendButton.disabled = false;
-                    userInput.disabled = false;
-                    fileUploadButton.disabled = false;
-                    clearSelectedFile();
-                    return;
-                }
-            } else {
-                // Standard text-only message
-                finalUserMessageContent = userText; 
-            }
-
-            // 1. Add User Message (Appended directly to the chatBox)
-            const displayContent = fileToDisplay ? `${userText} [Image: ${fileToDisplay.name}]` : userText;
-            addMessage('user', displayContent);
-            
-            currentHistory.push({ "role": "user", "content": finalUserMessageContent });
-            
-            clearSelectedFile();
-
-            // 💡 NEW/MODIFIED TITLE LOGIC HERE
-            if (isFirstMessage) {
-                let newTitle;
-                if (fileToDisplay) {
-                    // If it's the first message AND includes an image:
-                    imageAnalysisCounter++;
-                    newTitle = `Image Analysis ${imageAnalysisCounter}`;
-                } else {
-                    // If it's the first message and is only text:
-newTitle = truncateText(userText);
-                }
-                
-                updateChatTitle(currentChatId, newTitle); 
-                renderSidebar(); 
-            }
-            // ==========================================================
-
-
-            // 2. Add AI Placeholder Message
-            const aiMessageElement = addMessage('ai', 'Thinking...'); 
-
-            try {
-                const response = await fetch(GROQ_ENDPOINT, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${GROQ_API_KEY}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: CURRENT_MODEL.id, 
-                        messages: currentHistory, 
-                        temperature: 0.7,
-                        max_tokens: 500
-                    })
-                });
-
-                if (!response.ok) {
-                    let errorText = `HTTP Error: ${response.status} ${response.statusText}`;
-                    try {
-                        const errorData = await response.json();
-                        if (errorData.error && errorData.error.message) errorText = errorData.error.message;
-                    } catch (e) {}
-
-                    const match = errorText.match(/Please try again in (\d+\.?\d*)s/);
-                    if (match) throw new Error(`Rate Limit Exceeded. Try again in ${match[1]} seconds.`);
-                    else throw new Error(errorText);
-                }
-
-                const data = await response.json();
-                
-                const assistantResponse = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content
-                    ? data.choices[0].message.content
-                    : "Sorry, I received an empty response from the API.";
-                
-                const renderedHtml = (typeof marked !== 'undefined' && typeof marked.parse === 'function')
-                    ? marked.parse(assistantResponse) 
-                    : assistantResponse.replace(/\n/g, '<br>'); 
-                
-                // 3. Update AI Placeholder with final response
-                aiMessageElement.innerHTML = renderedHtml;
-                currentHistory.push({ "role": "assistant", "content": assistantResponse });
-                
-                scrollToBottom();
-                saveStateToLocalStorage();
-
-            } catch (error) {
-                console.error('Groq API Call Failed:', error);
-                aiMessageElement.innerHTML = `<span style="color:red;">${error.message}</span>`;
-            } finally {
-                toggleModelSelectorLock();
-                sendButton.disabled = false;
-                userInput.disabled = false;
-                fileUploadButton.disabled = false;
-                userInput.focus();
-                            setupMainInputCounter();
-
-            }
+    // 💡 Constructing the Multimodal Content Array (Logic unchanged)
+    if (fileToDisplay) {
+        if (!CURRENT_MODEL.multimodal) {
+            alert("Cannot send image. Please select a Multimodal model (like Llama 4 Scout).");
+            clearSelectedFile(); 
+            sendButton.disabled = false;
+            userInput.disabled = false;
+            fileUploadButton.disabled = false;
+            return;
         }
+           
+        try {
+            const base64Url = await encodeFileToBase64(fileToDisplay);
+               
+            finalUserMessageContent = [];
+            if (userText) {
+                finalUserMessageContent.push({ "type": "text", "text": userText });
+            }
+            finalUserMessageContent.push({ 
+                "type": "image_url", 
+                "image_url": { "url": base64Url } 
+            });
+
+        } catch (e) {
+            addMessage('ai', `Error reading file: ${e.message}`, chatBox);
+            sendButton.disabled = false;
+            userInput.disabled = false;
+            fileUploadButton.disabled = false;
+            clearSelectedFile();
+            return;
+        }
+    } else {
+        // Standard text-only message
+        finalUserMessageContent = userText; 
+    }
+
+    // 1. Add User Message (Appended directly to the chatBox)
+    const displayContent = fileToDisplay ? `${userText} [Image: ${fileToDisplay.name}]` : userText;
+    addMessage('user', displayContent);
+           
+    currentHistory.push({ "role": "user", "content": finalUserMessageContent });
+           
+    clearSelectedFile();
+
+    // 💡 NEW/MODIFIED TITLE LOGIC HERE (Logic unchanged)
+    if (isFirstMessage) {
+        let newTitle;
+        if (fileToDisplay) {
+            imageAnalysisCounter++;
+            newTitle = `Image Analysis ${imageAnalysisCounter}`;
+        } else {
+            newTitle = truncateText(userText);
+        }
+               
+        updateChatTitle(currentChatId, newTitle); 
+        renderSidebar(); 
+    }
+    // ==========================================================
+
+
+    // 2. Add AI Placeholder Message
+    const aiMessageElement = addMessage('ai', 'Thinking...'); 
+    
+    // CRITICAL FIX STEP 1: Get references to the elements we need to update
+    const aiContentContainer = aiMessageElement.querySelector('.message-content');
+    const aiCopyButton = aiMessageElement.querySelector('.copy-button'); // Get the copy button
+
+    let assistantResponse = "Sorry, I received an empty response from the API."; // Initialize response variable
+
+    try {
+        const response = await fetch(GROQ_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${GROQ_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: CURRENT_MODEL.id, 
+                messages: currentHistory, 
+                temperature: 0.7,
+                max_tokens: 500
+            })
+        });
+
+        if (!response.ok) {
+            let errorText = `HTTP Error: ${response.status} ${response.statusText}`;
+            try {
+                const errorData = await response.json();
+                if (errorData.error && errorData.error.message) errorText = errorData.error.message;
+            } catch (e) {}
+
+            const match = errorText.match(/Please try again in (\d+\.?\d*)s/);
+            if (match) throw new Error(`Rate Limit Exceeded. Try again in ${match[1]} seconds.`);
+            else throw new Error(errorText);
+        }
+
+        const data = await response.json();
+               
+        // CRITICAL: Store the final response in the variable
+        assistantResponse = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content
+            ? data.choices[0].message.content
+            : assistantResponse;
+               
+        const renderedHtml = (typeof marked !== 'undefined' && typeof marked.parse === 'function')
+            ? marked.parse(assistantResponse) 
+            : assistantResponse.replace(/\n/g, '<br>'); 
+               
+        // 3. Update AI Placeholder with final response
+        // CRITICAL FIX STEP 2: ONLY update the INNER content container
+        if (aiContentContainer) {
+            aiContentContainer.innerHTML = renderedHtml;
+        } else {
+             // Fallback: This will destroy the button, but at least the text updates
+             aiMessageElement.innerHTML = renderedHtml; 
+        }
+
+        // CRITICAL FIX STEP 3: Update the copy button's data attribute with the final text
+        if (aiCopyButton) {
+            aiCopyButton.setAttribute('data-text', assistantResponse);
+        }
+
+        currentHistory.push({ "role": "assistant", "content": assistantResponse });
+               
+        scrollToBottom();
+        saveStateToLocalStorage();
+
+    } catch (error) {
+        console.error('Groq API Call Failed:', error);
+        
+        // Update the content container with the error message
+        const errorHtml = `<span style="color:red;">${error.message}</span>`;
+        if (aiContentContainer) {
+            aiContentContainer.innerHTML = errorHtml;
+        } else {
+            aiMessageElement.innerHTML = errorHtml;
+        }
+        
+    } finally {
+        toggleModelSelectorLock();
+        sendButton.disabled = false;
+        userInput.disabled = false;
+        fileUploadButton.disabled = false;
+        userInput.focus();
+        setupMainInputCounter();
+    }
+}
 
         // --- Setup Event Listeners ---
         document.addEventListener('DOMContentLoaded', () => {
