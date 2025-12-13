@@ -1928,12 +1928,8 @@ function applyCustomCloak(customTitle, faviconURL) {
  * from Local Storage when the page loads.
  */
 function applyStoredCloak() {
-    // 🔑 Retrieve stored values
-    const storedTitle = localStorage.getItem(TITLE_KEY);
-    const storedFavicon = localStorage.getItem(FAVICON_KEY);
-if(storedTitle&& storedFavicon)
+
 applyCustomCloak(storedTitle,storedFavicon);
-}
 }
 
 // 🔑 Call the function to apply the stored cloak when the page loads
