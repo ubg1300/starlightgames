@@ -1257,7 +1257,23 @@ width: 80%;
               </select>
 
             </div>
+<div class="settings-item">
+    <label for="theme-toggle-switch">Theme:</label>
 
+    <div id="theme-toggle-switch" 
+         class="switch-container flex items-center cursor-pointer p-1" 
+         onclick="toggleTheme()"> 
+        
+        <div id="switch-thumb-theme" class="switch-thumb flex items-center justify-center">
+            
+            <svg id="switch-icon-theme" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path id="theme-icon-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+        </div>
+    </div>
+    
+    <span id="theme-status" class="status-text">Light Mode</span>
+</div>
             
             <div id="custom-cloak-options">
               <div
@@ -1304,23 +1320,7 @@ width: 80%;
               </div>
             </div>
 <div class="menu-section-title">⚙️ Page Security</div>
-<div class="settings-item">
-    <label for="theme-toggle-switch">Theme:</label>
 
-    <div id="theme-toggle-switch" 
-         class="switch-container flex items-center cursor-pointer p-1" 
-         onclick="toggleTheme()"> 
-        
-        <div id="switch-thumb-theme" class="switch-thumb flex items-center justify-center">
-            
-            <svg id="switch-icon-theme" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path id="theme-icon-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-            </svg>
-        </div>
-    </div>
-    
-    <span id="theme-status" class="status-text">Light Mode</span>
-</div>
 <div class="settings-item">
     
     <label for="blur-toggle-switch">Redirect:</label>
@@ -1863,7 +1863,10 @@ function applyStoredCloak() {
     if (storedTitle || storedFavicon) {
          // 2. Apply the retrieved data
         applyCustomCloak(storedTitle, storedFavicon);
-    } 
+    } else {
+              applyCustomCloak('Google', 'https://www.google.com/favicon.ico');
+
+    }
     
     
 }
