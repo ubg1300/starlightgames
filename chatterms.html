@@ -98,7 +98,10 @@
         <p>We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach these Terms.</p>
     </div>
     
-
+<script>
+          // --- Constants for Local Storage Keys ---
+const TITLE_KEY = 'customPageTitle';
+const FAVICON_KEY = 'customFaviconURL';
 /**
  * Applies custom page title and favicon URL,
  * and saves them to Local Storage for persistence.
@@ -150,6 +153,6 @@ window.addEventListener('DOMContentLoaded', () => {
     // Call the function directly when the basic HTML structure is ready
           setTimeout(applyStoredCloak, 600);
 });
-
+</script>
 </body>
 </html>
