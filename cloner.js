@@ -65,7 +65,6 @@ if (localStorage.getItem(localStorageKey4) === null) {
         
 }
 }
-alertthing()
 // --- New Delay Implementation ---
 document.addEventListener('DOMContentLoaded', function() {
     
