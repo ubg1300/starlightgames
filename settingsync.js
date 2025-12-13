@@ -1,173 +1,147 @@
-/**
- * settingsync.js
- * * Manages security features and dynamically creates the required overlay element and CSS.
- * * This script should be loaded via <script src="settingsync.js"></script>
- * * REVISED: Refined toggleContentVisibility using requestAnimationFrame for reliable fading.
- */
+// === CONFIGURATION CONSTANTS (Global Scope) ===
+const FADE_DURATION_MS =300;
+const STORAGE_KEY_PROTECTION = 'tabProtectionState';
+const STORAGE_KEY_REDIRECT = 'redirectToggleState';
+const REDIRECT_DELAY = 65; 
+const REDIRECT_URL = "https://www.google.com"; // Your desired redirect location
 
-(function() {
-    // === CONFIGURATION ===
-    const STORAGE_KEY_PROTECTION = 'tabProtectionState';
-    const STORAGE_KEY_REDIRECT = 'redirectToggleState';
-    const REDIRECT_DELAY = 65; // Delay for redirect on tab loss (in milliseconds)
-    const REDIRECT_URL = "https://www.google.com"; // <-- CHANGE THIS URL
+// === IMMEDIATE EXECUTION: THEME ATTRIBUTE LOAD & CSS INJECTION ===
+(function initializeSetup() {
+    // 1. Load Theme Attribute (Flash prevention)
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
 
-    let overlay = null;
+    // 2. Inject Dynamic CSS for Overlay Fading and Styling (Required for the overlay functionality)
+    const FADE_DURATION_CSS = `${FADE_DURATION_MS / 1000}s`;
+    const css = `
+        #offscreen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white; /* Customize your background */
+            z-index: 99999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: black;
+            font-family: sans-serif;
+            opacity: 1;
+            transition: opacity ${FADE_DURATION_CSS} ease-in-out;
+        }
+        #offscreen-overlay.fade-out {
+            opacity: 0 !important;
+        }
+    `;
+    const style = document.createElement('style');
+    style.textContent = css;
+    document.head.appendChild(style);
+})();
+
+
+// === CORE SYNCRONIZATION LOGIC (Delayed Execution) ===
+// Runs after a short delay to ensure the DOM is stable.
+setTimeout(() => {
+    
+    // === DOM ELEMENT (Overlay is the only required element) ===
+    let overlay = document.getElementById('offscreen-overlay');
     let timeoutHandle = null;
 
-    // === SETUP FUNCTIONS (Runs first to create necessary DOM elements and styles) ===
-
-    function createOverlayElement() {
-        // Create the overlay div if it doesn't exist
-        overlay = document.getElementById('overlay');
-        if (!overlay) {
-            overlay = document.createElement('div');
-            overlay.id = 'overlay';
-            overlay.innerHTML = `
-                <div style="text-align: center;">
-
-                </div>
-            `;
-            document.body.appendChild(overlay);
-        }
-    }
-
-    function injectOverlayCSS() {
-        const css = `
-            #overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: white; 
-                z-index: 99999;
-                display: none;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                color: black;
-                font-family: sans-serif;
-                
-                /* --- MODIFIED CSS FOR FADE EFFECT --- */
-                opacity: 1; 
-                transition: opacity 0.3s ease-in-out; /* Transition effect */
-            }
-            /* The 'hidden' class controls the opacity for the fade */
-            #overlay.hidden {
-                opacity: 0; 
-                pointer-events: none;
-            }
-            #overlay h1 {
-                font-size: 2em;
-                margin-bottom: 0.5em;
-            }
+    // --- Create Overlay Element if it doesn't exist ---
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'offscreen-overlay';
+        overlay.innerHTML = `
+            <div style="text-align: center;">
+            </div>
         `;
-        const style = document.createElement('style');
-        style.type = 'text/css';
-        style.appendChild(document.createTextNode(css));
-        document.head.appendChild(style);
+        document.body.appendChild(overlay);
     }
-
-    // === CORE SECURITY LOGIC ===
+    
+    // === CORE OVERLAY AND REDIRECT FUNCTIONS ===
     
     function toggleContentVisibility(showContent) {
-        if (!overlay) return; 
+        if (!overlay) return;
 
         if (showContent) {
-            // FADE OUT: 
-            overlay.classList.add('hidden'); // Start transition to opacity 0
-            
-            // Wait for the transition to finish before setting display: 'none'
+            // FADE OUT LOGIC
+            overlay.classList.add('fade-out');
             setTimeout(() => {
                 overlay.style.display = 'none';
-            }, 300); // 300ms matches the CSS transition time
-            
+                overlay.classList.remove('fade-out');
+            }, FADE_DURATION_MS);
         } else {
-            // FADE IN:
-            // 1. Prepare: Set display to 'flex' so it's in the DOM, but keep opacity 0 via 'hidden' class
-            overlay.classList.add('hidden');
+            // SHOW OVERLAY
+            overlay.classList.remove('fade-out'); 
             overlay.style.display = 'flex'; 
-            
-            // 2. Use requestAnimationFrame to ensure the browser has rendered 'display: flex'
-            requestAnimationFrame(() => {
-                // 3. Remove 'hidden' class, allowing opacity to transition from 0 to 1
-                overlay.classList.remove('hidden'); 
-            });
         }
     }
 
-    function redirect() {
-        if (timeoutHandle) clearTimeout(timeoutHandle);
-        window.location.replace(REDIRECT_URL); 
+    function redirect(isKeypress = false) {
+        clearTimeout(timeoutHandle);
+        
+        // Temporarily disable tab protection before redirecting if it was enabled.
+        if (isKeypress || localStorage.getItem(STORAGE_KEY_PROTECTION) === 'true') {
+            localStorage.setItem(STORAGE_KEY_PROTECTION, 'false');
+            // NOTE: UI update functions removed. We just modify localStorage.
+        }
+        
+        window.location.replace(REDIRECT_URL);
     }
 
-    // === EVENT LISTENERS ===
+    // === EVENT LISTENERS (Enforcing the security states from localStorage) ===
 
-    function initializeListeners() {
-        // 1. Tab Close Prevention Listener (onbeforeunload)
-        window.addEventListener('beforeunload', function(e) {
-            const tabProtectionEnabled = localStorage.getItem(STORAGE_KEY_PROTECTION) === 'true';
+    // 1. Tab Close Protection Enforcement
+    window.addEventListener('beforeunload', function(e) {
+        if (localStorage.getItem(STORAGE_KEY_PROTECTION) === 'true') { 
+            e.preventDefault(); 
+            e.returnValue = ''; 
+        }
+    });
 
-            if (tabProtectionEnabled) { 
-                e.preventDefault(); 
-                e.returnValue = '';
-            }
-        });
+    // 2. Redirect/Overlay Enforcement
+    document.addEventListener('visibilitychange', () => {
+        const redirectEnabled = localStorage.getItem(STORAGE_KEY_REDIRECT) === 'true' || localStorage.getItem(STORAGE_KEY_REDIRECT) === null;
 
-        // 2. Redirect/Overlay Listener (visibilitychange)
-        document.addEventListener('visibilitychange', () => {
-            const redirectEnabled = localStorage.getItem(STORAGE_KEY_REDIRECT) === 'true' || localStorage.getItem(STORAGE_KEY_REDIRECT) === null;
-
-            if (document.visibilityState === 'hidden') {
-                if (redirectEnabled) {
-                    timeoutHandle = setTimeout(redirect, REDIRECT_DELAY);
-                } else {
-                    toggleContentVisibility(false); // Show overlay (Fade In)
-                }
+        if (document.visibilityState === 'hidden') {
+            if (redirectEnabled) {
+                timeoutHandle = setTimeout(redirect, REDIRECT_DELAY);
             } else {
-                if (timeoutHandle) {
-                    clearTimeout(timeoutHandle);
-                    timeoutHandle = null;
-                }
+                toggleContentVisibility(false); // Show overlay
             }
-        });
-
-        // 3. Additional listener to clear redirect if focus is regained
-        window.addEventListener('focus', function () {
+        } else {
+            // Tab regained focus
             if (timeoutHandle) {
                 clearTimeout(timeoutHandle);
                 timeoutHandle = null;
             }
-        });
-        
-        // 4. Keypress Listener for 'E' and 'Space'
-        document.addEventListener('keydown', (event) => {
-            if (overlay && overlay.style.display === 'flex') {
-                
-                // 'E' key: Dismiss the cover (show content)
-                if (event.key.toUpperCase() === 'E') {
-                    toggleContentVisibility(true); // Hides the overlay with fade
-                    event.preventDefault();
-                }
-                
-                // 'Space' key: Execute immediate redirect
-                
-                if (event.key === ' ') {
-                    redirect(); // Executes immediate redirect
-                    event.preventDefault();
-                }
-            }
-        });
-    }
-
-    // === ENTRY POINT ===
-    document.addEventListener('DOMContentLoaded', () => {
-        injectOverlayCSS();
-        createOverlayElement();
-        initializeListeners();
-
-        console.log('[SETTINGSYNC] Security script is fully active and monitoring.');
+        }
     });
+
+    // 3. Cancel Redirect on Focus
+    window.addEventListener('focus', function () {
+        if (timeoutHandle) {
+            clearTimeout(timeoutHandle);
+            timeoutHandle = null;
+        }
+    });
+
+    // 4. Keypress Handlers ('E' to dismiss, 'SPACE' to force redirect)
+    document.addEventListener('keydown', (event) => {
+        if (overlay && overlay.style.display === 'flex') {
+            if (event.key.toUpperCase() === 'E') {
+                toggleContentVisibility(true); // Hide overlay (starts fade-out)
+                event.preventDefault();
+            }
+            if (event.key === ' ') {
+                redirect(true); // Redirect immediately (disables protection)
+                event.preventDefault();
+            }
+        }
+    });
+
+    console.log('[SYNCMONITOR] Background security script is active and enforcing states.');
     
-})();
+}, 800);
