@@ -185,10 +185,7 @@
         // IMPORTANT: Change the URL below to your application's actual link.
         window.location.href = '/'; 
     }
-          // --- Constants for Local Storage Keys ---
-const TITLE_KEY = 'customPageTitle';
-const FAVICON_KEY = 'customFaviconURL';
-    /**
+/**
  * Applies custom page title and favicon URL,
  * and saves them to Local Storage for persistence.
  * @param {string} customTitle - The new document title.
@@ -235,9 +232,9 @@ function applyStoredCloak() {
     
     
 }
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
     // Call the function directly when the basic HTML structure is ready
-          setTimeout(applyStoredCloak, 900);
+          setTimeout(applyStoredCloak, 800);
 });
 </script>
 
