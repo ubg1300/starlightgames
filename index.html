@@ -2123,7 +2123,7 @@ const localStorageKey = 'advisoryShown_v2_2_0';
       });
 window.addEventListener('DOMContentLoaded', () => {
     // Call the function directly when the basic HTML structure is ready
-    applyStoredCloak();
+          setTimeout(applyStoredCloak, 600);
 });
 
         // Get references to the modal elements
