@@ -739,6 +739,7 @@ width: 80%;
                   margin: 0;
                   border-radius: var(--border-radius);
                   font-size: 1.1em;
+                  
               }
               .menu-buttons button:hover {
                   transform: scale(0.98);
@@ -746,7 +747,36 @@ width: 80%;
                   box-shadow: var(--shadow-inset-light);
                   color: var(--primary-color);
               }
-
+              .menu-buttons2 {
+                
+                  display: flex;
+                  gap: 20px;
+                  flex-wrap: wrap;
+                  justify-content: center;
+                  
+              }
+              .menu-buttons2 button {
+                                  color: var(--text-color);
+                  background-color: var(--secondary-bg);
+                  border: none;
+                  transition: all 0.25s ease-in-out;
+                  box-shadow: var(--shadow-light-bottom), var(--shadow-light-top);
+                  font-weight: 500;
+                  
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  padding: 10px 20px;
+                  margin: 0;
+                  border-radius: var(--border-radius);
+                  font-size: .8em;
+              }
+              .menu-buttons2 button:hover {
+                  transform: scale(0.98);
+                  background-color: var(--secondary-bg);
+                  box-shadow: var(--shadow-inset-light);
+                  color: var(--primary-color);
+              }
               /* --- Iframe Navigation (Glassmorphism) --- */
               #iframe-container { display: none; height: 100vh; }
               #iframe-nav {
@@ -1041,6 +1071,7 @@ width: 80%;
   </noscript>
       </div>
     </div>
+
     <div id="loading-screen" class"sticky-on-scroll">
       <div class="loader-container">
         <div class="loader-circle"></div>
@@ -1194,6 +1225,7 @@ width: 80%;
           <div class="menu-section-title">⚙️ Page Settings</div>
 
           <div class="settings-container">
+
             <div class="settings-item">
               <label for="cloak-dropdown">Cloak Type:</label>
               <select
@@ -1281,7 +1313,7 @@ width: 80%;
         </div>
     </div>
     
-    <span id="theme-status" class="status-text">Light Mode</span>
+    <span id="theme-status" class="status-text">Light Mode</span>     
 </div>
             <div class="settings-item">
 
@@ -1313,10 +1345,11 @@ width: 80%;
 
     </div>
 
-    
 
 </div> 
-            
+            <div class="menu-buttons2">
+                    <button onclick="          showModal(`ADVISORY NOTES:\nTHE OWNER TAKES NO RESPONSIBILITY FOR YOUR ACTIONS!\n\nIf the games or anything running in the website gets blocked from studentkeeper, spam Homepage until it loads.\n\nIf you are having trouble with navigation tools please switch to utilities tab and select 'Starlight GG helper' to help with navigating\n\nIf your browser gets navigated away from the website, I suggest closing out the website that came from here.\n\nVersion: 2.2.0`);">Website Instructions</button>
+</div>
             <div id="custom-cloak-options">
               <div
                 class="menu-section-title"
@@ -1378,7 +1411,10 @@ width: 80%;
             </svg>
         </div>
     </div>
-    
+                  <div class="menu-buttons2">
+                    <button onclick="        showModal(`Redirect on: redirects to google when tab unfocused/switched. \nRedirect off: covers screen white until you click screen then click 'E' (If you click 'SpaceBar' on the webpage, the webpage redirects to google)`);
+">Redirect Info</button>
+</div>
 </div>
 
 <div class="settings-item">
@@ -2069,24 +2105,6 @@ async function runUrlCloak() { // MUST be async now
           if (loadingScreen) {
               loadingScreen.classList.add('hidden');
           }
-
-          // --- NEW ---
-          // Show the disclaimer *after* the loading screen is hidden
-const localStorageKey = 'advisoryShown_v2_2_0';  
-        if (localStorage.getItem(localStorageKey) === null) {
-        setTimeout(() => {
-       
-          showModal("ADVISORY NOTES:\nTHE OWNER TAKES NO RESPONSIBILITY FOR YOUR ACTIONS!\n\nIf the games or anything running in the website gets blocked from studentkeeper, spam Homepage until it loads.\n\nIf you are having trouble with navigation tools please switch to utilities tab and select 'Starlight GG helper' to help with navigating\n\nIf your browser gets navigated away from the website, I suggest closing out the website that came from here.\n\nVersion: 2.2.0");
-        
-        showModal("Redirect on: redirects to google when tab unfocused/switched. \nRedirect off: covers screen white until you click screen then click 'E' (If you click 'SpaceBar' on the webpage, the webpage redirects to google)");
-        
-        
-        // After showing all the modals, set the flag in localStorage
-        // This prevents the modals from showing again on subsequent visits
-        localStorage.setItem(localStorageKey, 'true');
-        
-    }, 500);
-      }
       }
       // Wait for the entire page to load (including images/resources)
       window.addEventListener('load', () => {
