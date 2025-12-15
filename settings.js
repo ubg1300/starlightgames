@@ -339,5 +339,5 @@ setTimeout(() => {
         overlayOptionContainer.style.display = savedRedirectState ? 'none' : 'flex';
     }
     
-}, 700);
+}, 1000);
 }); 
