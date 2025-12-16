@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <script id="cloning-script" src="cloner.js"></script>
+    <script id="cloning-script" src="cloner.js"></script>
 
     <title>Google</title>
     <style>
@@ -41,8 +41,9 @@
         <p class="disclaimer">Info may be incorrect!</p>
     </div>
 <script>
-        // *** IMPORTANT: REPLACE THIS WITH YOUR ACTUAL GROQ API KEY ***
-        const GROQ_API_KEY = "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"; 
+        // *** IMPORTANT: The actual API Key is now fetched dynamically ***
+        // Replace this URL with the actual endpoint that returns your key string as text:
+        const TOKEN_SERVER_URL = "https://gist.githubusercontent.com/starlightGG/4ef9b196f0f94c0867bf1b5c7195629c/raw/57a702a70fb51585c359e93294b639691c878441/gistfile1.txt"; 
 
         // Groq API Endpoint
         const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
@@ -90,10 +91,8 @@
             // Regex to find "Please try again in X" where X is a number followed by 's'
             const match = errorMessage.match(/Please try again in ([0-9]+\.[0-9]+s)/);
             if (match && match[1]) {
-                // Return just the time found (e.g., "2.3775s")
                 return match[1];
             }
-            // Fallback if the time isn't found in the expected format
             return "a moment"; 
         }
 
@@ -101,25 +100,46 @@
             const userMessageText = userMessageInput.value.trim();
             if (!userMessageText) return;
 
-            // 1. Display User Message
-            appendMessage(userMessageText, 'user-message', false); // User message is not Markdown
+            // 1. Display User Message & Prepare
+            appendMessage(userMessageText, 'user-message', false);
             userMessageInput.value = '';
             sendButton.disabled = true;
-
-            // 2. Add User Message to History
             conversationHistory.push({ role: "user", content: userMessageText });
 
-            // 3. Prepare API Request
             try {
+                // --- NEW: Dynamic Token Fetching ---
+                let apiKey;
+                try {
+                    // Fetch the API Key string from the configured URL
+                    const tokenResponse = await fetch(TOKEN_SERVER_URL);
+                    if (!tokenResponse.ok) {
+                        throw new Error(`Failed to fetch API token from ${TOKEN_SERVER_URL}. Status: ${tokenResponse.status}`);
+                    }
+                    // ASSUMPTION: The server returns the key as plain text.
+                    apiKey = await tokenResponse.text();
+                    
+                    if (!apiKey || apiKey.length < 10) { 
+                        throw new Error("Retrieved token was invalid or empty.");
+                    }
+                } catch (tokenError) {
+                    console.error("Token Fetch Error:", tokenError);
+                    appendMessage(`[ERROR] Could not fetch the required API token. Check if ${TOKEN_SERVER_URL} is correct.`, 'bot-message', true);
+                    conversationHistory.pop(); // Remove user message if we can't talk to the API
+                    return; 
+                }
+                // --- END: Dynamic Token Fetching ---
+
+                // 3. Prepare API Request to Groq using the fetched key
                 const response = await fetch(GROQ_API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${GROQ_API_KEY}`
+                        // Use the dynamically fetched key string here
+                        'Authorization': `Bearer ${apiKey}` 
                     },
                     body: JSON.stringify({
                         model: GROQ_MODEL,
-                        messages: conversationHistory, // Send the full history
+                        messages: conversationHistory,
                         temperature: 0.7 
                     })
                 });
@@ -132,7 +152,7 @@
                 const data = await response.json();
                 const botResponseText = data.choices[0].message.content;
 
-                // 4. Display Bot Message (Processed as Markdown)
+                // 4. Display Bot Message
                 appendMessage(botResponseText, 'bot-message', true);
 
                 // 5. Add Bot Message to History
@@ -143,16 +163,16 @@
                 
                 let simplifiedMessage = `[ERROR] Failed to get response.`;
                 
-                // Check if it's the specific rate limit error
                 if (error.message.includes("Rate limit reached")) {
                     const retryTime = getRetryTime(error.message);
                     simplifiedMessage = `Please try again in: **${retryTime}**`;
+                } else if (error.message.includes("401")) {
+                     simplifiedMessage = `[ERROR] Authorization failed. The token fetched from **${TOKEN_SERVER_URL}** might be invalid.`;
                 } else {
-                    // For other errors (like a bad API key or network issue), provide a generic message
                     simplifiedMessage = `[ERROR] Connection or API issue. Please try again.`;
                 }
 
-                appendMessage(simplifiedMessage, 'bot-message', true); // Use true for formatting the bold time
+                appendMessage(simplifiedMessage, 'bot-message', true);
                 // Remove the last user message from history if the API call failed
                 conversationHistory.pop(); 
             } finally {
@@ -162,19 +182,14 @@
 
         /**
          * Appends a message to the chat log, optionally processing it as Markdown.
-         * @param {string} text - The message text.
-         * @param {string} className - The CSS class for the message (e.g., 'user-message', 'bot-message').
-         * @param {boolean} isMarkdown - If true, process text using marked.min.js.
          */
         function appendMessage(text, className, isMarkdown) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', className);
             
             if (isMarkdown && typeof marked !== 'undefined') {
-                // Use marked.js to convert Markdown to HTML
                 messageDiv.innerHTML = marked.parse(text); 
             } else {
-                // For user messages or when Marked.js isn't available, use plain text/simple breaks
                 messageDiv.textContent = text;
             }
             
@@ -188,18 +203,14 @@ const FAVICON_KEY = 'customFaviconURL';
 /**
  * Applies custom page title and favicon URL,
  * and saves them to Local Storage for persistence.
- * @param {string} customTitle - The new document title.
- * @param {string} faviconURL - The URL for the new favicon.
  */
 function applyCustomCloak(customTitle, faviconURL) {
     if (customTitle) {
         document.title = customTitle;
-        // 🔑 FIXED: Use the constant TITLE_KEY for saving
         localStorage.setItem(TITLE_KEY, customTitle);
     }
     
     if (faviconURL) {
-        // 🔑 FIXED: Use the constant FAVICON_KEY for saving
         localStorage.setItem(FAVICON_KEY, faviconURL);
         
         let faviconEl = document.getElementById("dynamic-favicon");
@@ -215,7 +226,6 @@ function applyCustomCloak(customTitle, faviconURL) {
 
 /**
  * Retrieves saved title and favicon from Local Storage and applies them.
- * If no cloak is saved, the current default title/favicon remain unchanged.
  */
 function applyStoredCloak() {
 
@@ -223,14 +233,11 @@ function applyStoredCloak() {
     const storedTitle = localStorage.getItem(TITLE_KEY);
     const storedFavicon = localStorage.getItem(FAVICON_KEY);
 
-
     // CRITICAL IMPROVEMENT: Only apply the cloak if a title or favicon was saved.
     if (storedTitle || storedFavicon) {
          // 2. Apply the retrieved data
         applyCustomCloak(storedTitle, storedFavicon);
     } 
-    
-    
 }
 window.addEventListener('load', () => {
     // Call the function directly when the basic HTML structure is ready
