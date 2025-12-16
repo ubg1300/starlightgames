@@ -178,23 +178,26 @@ setTimeout(() => {
         if (!overlayToggleSwitch) return;
         if (isEnabled) {
             overlayToggleSwitch.classList.add('switch-on');
-            // Icon for ON (Visible Eye)
-            if(overlaySwitchIcon) overlaySwitchIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`;
+            // Icon for ON (Slashed Eye)
+                        if(overlaySwitchIcon) overlaySwitchIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`;
+
         } else {
             overlayToggleSwitch.classList.remove('switch-on');
-            // Icon for OFF (Slashed Eye)
-            if(overlaySwitchIcon) overlaySwitchIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.879 16.121A10.05 10.05 0 0112 15c4.477 0 8.268-2.943 9.542-7-1.274-4.057-5.065-7-9.542-7a9.97 9.97 0 00-2.31 1.708m-1.72-1.72l-1.81 1.81M14.25 18.75l-1.72-1.72M5.25 5.25l1.81 1.81M18.75 18.75l-1.81-1.81" />`;
+            // Icon for OFF ( Eye)
+            if(overlaySwitchIcon) overlaySwitchIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`;
         }
     }
 
     function applyThemeUI(theme) { 
         if (theme === 'dark') {
             if (themeSwitchContainer) themeSwitchContainer.classList.add('switch-on');
-            if (themeIcon) themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />`;
+                        if (themeIcon) themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />`;
+
             if (themeStatusSpan) themeStatusSpan.textContent = 'Dark Mode';
         } else {
             if (themeSwitchContainer) themeSwitchContainer.classList.remove('switch-on');
-            if (themeIcon) themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />`;
+                        if (themeIcon) themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />`;
+
             if (themeStatusSpan) themeStatusSpan.textContent = 'Light Mode';
         }
     }
