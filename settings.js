@@ -179,11 +179,11 @@ setTimeout(() => {
         if (isEnabled) {
             overlayToggleSwitch.classList.add('switch-on');
             // Icon for ON (Slashed Eye)
-                        if(overlaySwitchIcon) overlaySwitchIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`;
+            if(overlaySwitchIcon) overlaySwitchIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.879 16.121A10.05 10.05 0 0112 15c4.477 0 8.268-2.943 9.542-7-1.274-4.057-5.065-7-9.542-7a9.97 9.97 0 00-2.31 1.708m-1.72-1.72l-1.81 1.81M14.25 18.75l-1.72-1.72M5.25 5.25l1.81 1.81M18.75 18.75l-1.81-1.81" />`;
 
         } else {
             overlayToggleSwitch.classList.remove('switch-on');
-            // Icon for OFF ( Eye)
+            // Icon for OFF (Eye)
             if(overlaySwitchIcon) overlaySwitchIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`;
         }
     }
