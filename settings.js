@@ -133,12 +133,9 @@ setTimeout(() => {
     // === UI UPDATE FUNCTIONS ===
     
     function updateProtectionUI(isEnabled) { 
-            // FIX: If protection is logically enabled (default), explicitly set it to 'true' in storage.
-    // This ensures the 'beforeunload' listener sees the required 'true' value immediately on first load.
-    if (savedProtectionState) {
-        localStorage.setItem(STORAGE_KEY_PROTECTION, 'true');
-    }
+
         if (isEnabled) {
+                    localStorage.setItem(STORAGE_KEY_PROTECTION, 'true'); // may fix errors
             const closepreventionwarning = 'closepreventionwarning'; 
             if (localStorage.getItem(closepreventionwarning) === null) {
                 localStorage.setItem(closepreventionwarning, 'true');
