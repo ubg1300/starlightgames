@@ -55,15 +55,24 @@ window.toggleOverlay = function() {
     document.dispatchEvent(new Event('securityToggle'));
 }
 
-// NEW FUNCTION: Toggle for the separate About:Blank Popup (ONLY sets localStorage)
+// --- FIX 2: Add showModal logic to the global toggle function ---
 window.toggleAboutBlankPopup = function() {
-let popupEnabled = localStorage.getItem('aboutBlankPopupState') !== 'false';
+    let popupEnabled = localStorage.getItem('aboutBlankPopupState') !== 'false';
+    const wasEnabled = popupEnabled; // Store the current state
+    
     popupEnabled = !popupEnabled;
     
     // Sets local storage item to 'true' or 'false'
     localStorage.setItem('aboutBlankPopupState', popupEnabled ? 'true' : 'false');
-    // <<< NEW: Set the flag to false before dispatching, signaling a user-initiated change
-    isInitialLoad = false; 
+
+    // Only show modal if it was enabled (true) and is now disabled (false), 
+    // AND if it's not the initial load (which is handled by the timeout in initialization)
+    if (wasEnabled && !popupEnabled && !isInitialLoad) {
+        // Assuming showModal is globally available
+        showModal("I wouldn't recommend turning this option off since 'GoGuardian' can see your tabs and this website can popup in history. If you want, you can enable it back.");
+    }
+    
+    isInitialLoad = false; 
     document.dispatchEvent(new Event('securityToggle'));
 }
 
@@ -219,10 +228,7 @@ setTimeout(() => {
             if(aboutBlankSwitchIcon) aboutBlankSwitchIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />`;
                             localStorage.setItem('aboutBlankPopupState', 'false');
 
-            // <<< CHANGE: Only show modal if it's NOT the initial page load
-            if (!isInitialLoad) { 
-                 showModal("I wouldn't recommend turning this option off since 'GoGuardian' can see your tabs and this can popup in history, if you want, you can enable it back.");
-            }
+
         }
     }
 
