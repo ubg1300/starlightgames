@@ -2109,7 +2109,7 @@ async function applyUrlCloak(targetUrl) {
         applyCustomCloak(newTitle, newFaviconURL);
         localStorage.setItem(TITLE_KEY, newTitle);
         localStorage.setItem(FAVICON_KEY, newFaviconURL);
-        localStorage.setItem('LINKTAB_KEY', 'https://google.com');
+        localStorage.setItem('LINKTAB_KEY', url);
 
         // Notify the user
         await showModal(`Successfully applied cloak from URL: ${targetUrl}\nTitle: ${newTitle}\nFavicon URL: ${newFaviconURL || 'Not Found'}`);
@@ -2187,7 +2187,7 @@ async function runUrlCloak() { // MUST be async now
 
     // Keep the dropdown on "URL Cloak"
     document.getElementById('cloak-dropdown').value = "url-cloak";
-            localStorage.setItem('LINKTAB_KEY', 'https://google.com');
+            localStorage.setItem('LINKTAB_KEY', url);
 
     showModal(`URL Cloak Applied!\nTitle: ${fetchedTitle}\nFavicon fetched for: ${url} \n(If the title is messed up, please go to custom and put the correct custom title, leave favicon URL blank also.)`);
 }
