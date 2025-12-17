@@ -1,7 +1,10 @@
 // === CONFIGURATION CONSTANTS (Global Scope) ===
 const FADE_DURATION_MS = 300; // 300 milliseconds
 const FADE_DURATION_CSS = `${FADE_DURATION_MS / 1000}s`; // Creates "0.3s" for CSS
+    if (savedAboutBlankState == 'null'){
+                        localStorage.setItem('aboutBlankPopupState', 'true');
 
+    }
 // --- GLOBAL FLAG ---
 let manualExitIntent = false;
 let blankWindow = null; // Kept as a declaration, but unused for action here
@@ -388,10 +391,7 @@ setTimeout(() => {
     updateAboutBlankUI(savedAboutBlankState);
     applyThemeUI(savedTheme);
     updateStatsUI(savedStatsState);
-    if (savedAboutBlankState == 'null'){
-                        localStorage.setItem('aboutBlankPopupState', 'true');
 
-    }
     // Initial check for Overlay option visibility
     if (overlayOptionContainer) {
         overlayOptionContainer.style.display = savedRedirectState ? 'none' : 'flex';
