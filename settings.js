@@ -81,6 +81,7 @@ setTimeout(() => {
     const STORAGE_KEY_STATS = 'statsToggleState';
     const REDIRECT_DELAY = 65; 
     const REDIRECT_URL = localStorage.getItem('LINKTAB_KEY');
+    const REDIRECT_URL_fallback = 'https://google.com/'
 
     // === DOM ELEMENTS ===
     // Security UI
@@ -237,7 +238,12 @@ setTimeout(() => {
     function redirect(isKeypress = false) {
         clearTimeout(timeoutHandle);
         manualExitIntent = true; 
+        if(REDIRECT_URL){
         window.location.replace(REDIRECT_URL);
+        }else{
+                    window.location.replace(REDIRECT_URL_fallback);
+
+        }
     }
 
     // === EVENT LISTENERS ===
