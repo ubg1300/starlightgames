@@ -1144,10 +1144,16 @@ width: 80%;
               <button
               onclick="GGgames()"
             >
-              🕹️ Load StarlightGG Hub (Recommended)
+              🕹️ Load StarlightGG Hub
             </button>
           </div>
-
+          <div class="menu-buttons">
+              <button
+              onclick="GGgames2()"
+            >
+              🕹️ Load StarlightGG Hub 2.0 (Recommended)
+            </button>
+          </div>
           <div style="margin-top: 30px;" class="menu-section-title">🔗 Third party Links</div>
           <div class="menu-buttons">
             <button
@@ -1573,7 +1579,14 @@ function GGgames() {
   disclamers=false;
   }
 }
-
+let disclamers2 = true;
+function GGgames2() {
+  showIframe('https://starlightgg.github.io/lunaar-lite/'); 
+  if (disclamers2){
+  showModal('Most these games might be broken, help the owner out by telling them whats broken.');
+  disclamers2=false;
+  }
+}
 function updateQuote() {
     // Only proceed if quotes have been loaded and the display element exists
     if (quoteDisplay && quotes.length > 0) {
